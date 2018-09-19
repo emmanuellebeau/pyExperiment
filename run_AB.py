@@ -1,9 +1,9 @@
 from psychopy.visual import ImageStim #import some libraries from PsychoPy
-from psychopy import visual, event
+from psychopy import visual, event, core
 import matplotlib.pyplot as plt
 import os
 import numpy as np
-from experiments import AB
+from experiments import *
 from numpy.random import choice as rchoice
 
 def load_images():
@@ -16,6 +16,7 @@ def load_images():
         if img.max() > 1:
             img *= 1.0/255.0
         images.append(img)
+    return images
 
 def createMasks(images, n_masks, size=10):
     """
@@ -62,10 +63,15 @@ def createTrialSequence(AB, T1, T2, images, masks, n_masks, RSVP_len, im_size):
 
 # load images
 images = load_images()
-
-AB = AB(n_sessions=2, n_runs=1)
+print('starting')
+info = getSubjectInfo()
+#AB = AB(n_sessions=2, n_runs=1)
+AB = AB(**info)
+AB.initTrialLog()
+print('initated AB')
 win = visual.Window([800,600], monitor="testMonitor", units="deg")
-core.wait(2)
+core.wait(3)
+
 AB.win = win
 # generate trials
 n_images = len(images)
@@ -89,8 +95,8 @@ trial_dict = {
             'T2 menu': None,
             'T1 responses': None, # possible key responses
             'T2 responses': None, # possible key responses
-            'T1 correct respons': None,
-            'T2 correct respons': None
+            'T1 correct response': None,
+            'T2 correct response': None
             }
 
 masks = createMasks(images, n_masks)
@@ -110,11 +116,12 @@ for i in range(n_trials):
 
     # create image instances for menu
     T1_menu = [ImageStim(AB.win, images[x], name=f'T1 menu {x}',
-                         size=im_size,  flipVert=True) for x in T1_opt]
+                         size=im_size, pos=[-4,0],  flipVert=True) for x in T1_opt]
     T2_menu = [ImageStim(AB.win, images[x], name=f'T2 menu {x}',
-                         size=im_size,  flipVert=True) for x in T2_opt]
+                         size=im_size, pos=[4,0],  flipVert=True) for x in T2_opt]
     # Add specifics to trial_dict
-    trial_dic['trial sequence'] = trial_sequence
+    trial_dict['trial sequence'] = trial_sequence
+    trial_dict['trial type'] = 'lag 2'
     trial_dict['T1'] = T1
     trial_dict['T2'] = T2
     trial_dict['T1 options'] = T1_opt
@@ -124,14 +131,14 @@ for i in range(n_trials):
     trial_dict['T1 responses'] = ['z', 'm']
     trial_dict['T2 responses'] = ['z', 'm']
     if T1_opt[0] == T1:
-        trial_dic['T1 correct respons'] = 'z'
+        trial_dict['T1 correct response'] = 'z'
     else:
-        trial_dic['T1 correct respons'] = 'm'
+        trial_dict['T1 correct response'] = 'm'
 
     if T2_opt[0] == T2:
-        trial_dic['T2 correct respons'] = 'z'
+        trial_dict['T2 correct response'] = 'z'
     else:
-        trial_dic['T2 correct respons'] = 'm'
+        trial_dict['T2 correct response'] = 'm'
 
     AB.addTrial(trial_dict)
 AB.start()

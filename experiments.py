@@ -7,14 +7,13 @@ from controller import *
 A selection of experiment classes
 """
 
-class bareBoneExperiment(Experiment):
+class bareBoneExperiment(Controller):
     """
     Bare minimum of attributes and methods needed to be compatible with
     the Experiment-class
     """
-    def __init__(self, win, **args):
+    def __init__(self, **args):
         super().__init__(**args)
-        self.win = win
         self.trials = []
 
     def runTrials():
@@ -24,16 +23,13 @@ class bareBoneExperiment(Experiment):
         self.trials = []
 
 
-class AB(Experiment):
+class AB(Controller):
     """
     Todo:
         Write this doc string
     """
     def __init_(self, **args):
-        super().__init__(self, **args)
-        self.win = False
-        self.trials = []
-        self._initTrialLog()
+        Controller.__init__(self, **args)
 
     def drawAndWait(self, obj_list, responses=[]):
         """
@@ -54,7 +50,7 @@ class AB(Experiment):
                     return key[0]
             event.clearEvents()
 
-    def _initTrialLog(self):
+    def initTrialLog(self):
         """
         A more specific log for only saving necessary
         trial by trial information
@@ -83,7 +79,7 @@ class AB(Experiment):
                       self.block, self.trial, tp['T1'], tp['T2'],
                       tp['T1 options'], tp['T2 options'], self.t1_response,
                       self.t2_response, self.t1_rt, self.t2_rt,
-                      self.t1_hit, self.t2_hit]
+                      tp['t1_hit'], tp['t2_hit']]
         trial_info = [str(x) for x in trial_info]
         with open(self.trial_log_name, 'a') as f:
             f.write('\t'.join(trial_info) + '\n')
@@ -163,6 +159,9 @@ class AB(Experiment):
                  f'{trial_start.getTime()}')
         self.t2_response = self.drawAndWait(tp['T2 menu'], responses=tp['T2 responses'])
         self.t2_rt = timer.getTime()
+
+        tp['t1_hit'] = tp['T1 correct response'] == self.t1_response
+        tp['t2_hit'] = tp['T2 correct response'] == self.t2_response
 
         # save trial data
         self.updateTrialLog(tp)

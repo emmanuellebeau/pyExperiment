@@ -21,9 +21,36 @@ class PupilLogging():
         Todo:
             fix connection for messages to eyelink
         """
+def getSubjectInfo(experiment_name='my name', n_sessions=2, n_runs=2):
+    subject_data = {}
+    subject_data['subject_id'] = input('sub: ')
+    subject_data['age'] = int(input('age: '))
+    subject_data['run'] = int(input('run: '))
+    subject_data['session'] = int(input('session: '))
+    return subject_data
+    # myDlg = gui.Dlg(title=f"{experiment_name} experiment")
+    # myDlg.addText('Subject info')
+    # myDlg.addField('Subject ID:', 'sub-')
+    # myDlg.addField('Age:')
+    # myDlg.addText('Experiment Info')
+    # myDlg.addField('Session:', choices=list(range(1, n_sessions+1)))
+    # myDlg.addField('Run:', choices=list(range(1, n_runs+1)))
+    # ok_data = myDlg.show()  # show dialog and wait for OK or Cancel
+    #
+    # if myDlg.OK:  # or if ok_data is not None
+    #     myDlg.close()
+    #     subject_data = {'subject_id': ok_data[0],
+    #                     'age':ok_data[1],
+    #                     'session':ok_data[2],
+    #                     'run':ok_data[3]}
+    #     return subject_data
+    # else:
+    #     sys.exit('User cancelled!')
 
-class Experiment(EEGLogging, PupilLogging):
-    def __init__(self, name='my_experiment', n_sessions=2, n_runs=8):
+
+
+class Controller():
+    def __init__(self, subject_id, age, session, run, name='my_experiment', n_sessions=2, n_runs=8):
         """
         Parent class for any type of experiment. Your experiment class needs a
         runTrial-method that will be called from this parent class. Your
@@ -42,18 +69,20 @@ class Experiment(EEGLogging, PupilLogging):
         Todo:
             * TODO - a lot
         """
+        pass
         self.experiment_name = name
         self.n_sessions = n_sessions
         self.n_runs = n_runs
-        self.subject_info = self.subjectInfo()
-        if not self.subject_info:
-            sys.exit('User cancelled!')
-        self.subject_id = self.subject_info[0]
-        self.age = self.subject_info[1]
-        self.session = self.subject_info[2]
-        self.run = self.subject_info[3]
+        #self.subject_info = self.subjectInfo()
+        self.subject_id = subject_id
+        self.age = age
+        self.session = session
+        self.run = run
         self.logger = self._initLogger()
+        self.block = 1
         self.trial = 1
+        self.trials = []
+        self.win = False
         self.run_start = core.Clock()
 
         start_str = f'Starting {self.experiment_name} for subject '\
@@ -61,21 +90,6 @@ class Experiment(EEGLogging, PupilLogging):
                     f'{self.session} run {self.run}'
         self.log(start_str)
 
-
-    def subjectInfo(self):
-        myDlg = gui.Dlg(title=f"{self.experiment_name} experiment")
-        myDlg.addText('Subject info')
-        myDlg.addField('Subject ID:', 'sub-')
-        myDlg.addField('Age:')
-        myDlg.addText('Experiment Info')
-        myDlg.addField('Session:', choices=list(range(1, self.n_sessions+1)))
-        myDlg.addField('Run:', choices=list(range(1, self.n_runs+1)))
-        ok_data = myDlg.show()  # show dialog and wait for OK or Cancel
-
-        if myDlg.OK:  # or if ok_data is not None
-            return ok_data
-        else:
-            return False
 
 
     def _initLogger(self):
@@ -92,6 +106,7 @@ class Experiment(EEGLogging, PupilLogging):
                             level=10, format=LOG_FORMAT)
 
         return logging.getLogger()
+
 
     def log(self, text, level='info'):
         """

@@ -16,7 +16,7 @@ for im in range(1, 41):
 
 win = visual.Window([800,600],monitor="testMonitor", units="deg")
 im1 = visual.ImageStim(win=win, image=images[0], pos=[-4,0], size=(5,5), flipVert=True)
-im2 = visual.ImageStim(win=win, image=images[0], pos=[4,0], size=(5,5), flipVert=True)
+im2 = visual.ImageStim(win=win, image=images[5], pos=[4,0], size=(5,5), flipVert=True)
 im1.draw()
 im2.draw()
 win.flip()
