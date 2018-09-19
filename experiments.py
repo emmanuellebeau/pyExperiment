@@ -124,7 +124,7 @@ class AB(Controller):
                  f'block start - {self.block_start.getTime()}')
 
         # show fixation
-        fixation = visual.GratingStim(win=self.win, size=5, pos=[0,0], sf=0, rgb=-1)
+        fixation = visual.GratingStim(win=self.win, size=0.4, pos=[0,0], sf=0, rgb=-1)
         fixation.draw()
         self.win.flip()
         core.wait(tp['fixation time'])
@@ -138,7 +138,6 @@ class AB(Controller):
                      f' - block start - {self.block_start.getTime()} - '\
                      f'run start - {self.run_start.getTime()}')
             core.wait(tp['imgdur'])
-            fixation.draw()
             self.win.flip()
             core.wait(tp['SOA'])
 

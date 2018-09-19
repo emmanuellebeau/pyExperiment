@@ -53,7 +53,7 @@ def getSubjectInfo(experiment_name='my name', n_sessions=2, n_runs=2):
 
 
 
-class Controller():
+class Controller(EEGLogging, PupilLogging):
     def __init__(self, name='my_experiment', n_sessions=2, n_runs=8):
         """
         Parent class for any type of experiment. Your experiment class needs a

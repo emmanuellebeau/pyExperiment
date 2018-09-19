@@ -6,6 +6,12 @@ import numpy as np
 from experiments import *
 from numpy.random import choice as rchoice
 
+"""
+TODO:
+    fix monitor
+    fix dialogue box for getting responses
+"""
+
 def load_images():
     STIM_FOLDER = 'stim/'
     images = []
@@ -17,6 +23,13 @@ def load_images():
             img *= 1.0/255.0
         images.append(img)
     return images
+
+def loadInfoTxt():
+    b = ''
+    with open('instructions.txt', 'r') as f:
+        for line in f.readlines():
+            b += line + '\n'
+    return b
 
 def createMasks(images, n_masks, size=10):
     """
@@ -48,30 +61,28 @@ def createMasks(images, n_masks, size=10):
 
 def createTrialSequence(AB, T1, T2, t1_pos, t2_pos, images, masks, n_masks, RSVP_len, im_size):
     # Create trial_sequence
+    bgcolor = [0.5, 0.5, 0.5]
     trial_sequence = [rchoice(range(n_masks)) for x in range(RSVP_len)]
-    trial_sequence = [ImageStim(AB.win, masks[x], name=f'Mask {x}',
+    trial_sequence = [ImageStim(AB.win, masks[x], name=f'Mask {x}', color=bgcolor,
                       size=im_size, flipVert=True) for x in trial_sequence]
     # convert to ImageStims
     # pick a random T1 and T2
 
-    trial_sequence[t1_pos] = ImageStim(AB.win, images[T1], name=f'T1 {T1}',
+    trial_sequence[t1_pos] = ImageStim(AB.win, images[T1], name=f'T1 {T1}', color=bgcolor,
                                        size=im_size,  flipVert=True)
-    trial_sequence[t2_pos] = ImageStim(AB.win, images[T2], name=f'T2 {T2}',
+    trial_sequence[t2_pos] = ImageStim(AB.win, images[T2], name=f'T2 {T2}', color=bgcolor,
                                        size=im_size,  flipVert=True)
 
     return trial_sequence
 
 # load images
 images = load_images()
-print('starting')
 
 #AB = AB(n_sessions=2, n_runs=1)
 AB = AB(name='AB')
 AB.initTrialLog()
 print('initated AB')
 win = visual.Window([800,600], monitor="testMonitor", units="deg")
-core.wait(3)
-
 AB.win = win
 # generate trials
 n_images = len(images)
@@ -115,10 +126,14 @@ for i in range(n_trials):
 
     # create image instances for menu
     pos = ([-4, 0], [4, 0])
+    menu_txt = visual.TextStim(win, text='Which one was the first target', pos=(0, 4), height=0.35)
+    menu_txt2 = visual.TextStim(win, text='Which one was the second target', pos=(0, 4), height=0.35)
     T1_menu = [ImageStim(AB.win, images[x], name=f'T1 menu {x}',
                          size=im_size, pos=pos[i],  flipVert=True) for i, x in enumerate(T1_opt)]
+    T1_menu.append(menu_txt)
     T2_menu = [ImageStim(AB.win, images[x], name=f'T2 menu {x}',
                          size=im_size, pos=pos[i],  flipVert=True) for i, x in enumerate(T2_opt)]
+    T2_menu.append(menu_txt2)
     # Add specifics to trial_dict
     trial_dict['trial sequence'] = trial_sequence
     trial_dict['trial type'] = 'lag 2'
@@ -140,4 +155,8 @@ for i in range(n_trials):
     else:
         trial_dict['T2 correct response'] = 'm'
     AB.addTrial(trial_dict.copy())
-AB.start()
+
+info_txt = loadInfoTxt()
+info_message = visual.TextStim(win, text=info_txt, pos=(0, 0), height=0.35)
+params = {'obj_list': [info_message], 'responses': ['space']}
+AB.start(runBefore=[(AB.drawAndWait, params)])
