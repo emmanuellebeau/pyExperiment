@@ -46,7 +46,7 @@ def createMasks(images, n_masks, size=10):
         masks.append(mask)
     return masks
 
-def createTrialSequence(AB, T1, T2, images, masks, n_masks, RSVP_len, im_size):
+def createTrialSequence(AB, T1, T2, t1_pos, t2_pos, images, masks, n_masks, RSVP_len, im_size):
     # Create trial_sequence
     trial_sequence = [rchoice(range(n_masks)) for x in range(RSVP_len)]
     trial_sequence = [ImageStim(AB.win, masks[x], name=f'Mask {x}',
@@ -64,9 +64,9 @@ def createTrialSequence(AB, T1, T2, images, masks, n_masks, RSVP_len, im_size):
 # load images
 images = load_images()
 print('starting')
-info = getSubjectInfo()
+
 #AB = AB(n_sessions=2, n_runs=1)
-AB = AB(**info)
+AB = AB(name='AB')
 AB.initTrialLog()
 print('initated AB')
 win = visual.Window([800,600], monitor="testMonitor", units="deg")
@@ -103,9 +103,8 @@ masks = createMasks(images, n_masks)
 for i in range(n_trials):
     T1 = rchoice(range(n_images), 1)[0]
     T2 = rchoice(range(n_images), 1)[0]
-    trial_sequence = createTrialSequence(AB, T1, T2, images, masks, n_masks,
-                                         RSVP_len, im_size)
-
+    trial_sequence = createTrialSequence(AB, T1, T2, t1_pos, t2_pos, images,
+                                         masks, n_masks, RSVP_len, im_size)
     # Make menu options
     possible_menu_options = np.setdiff1d(range(n_images), [T1, T2])
     T1_opt = np.append(rchoice(possible_menu_options, 1), T1)
@@ -115,10 +114,11 @@ for i in range(n_trials):
     np.random.shuffle(T2_opt)
 
     # create image instances for menu
+    pos = ([-4, 0], [4, 0])
     T1_menu = [ImageStim(AB.win, images[x], name=f'T1 menu {x}',
-                         size=im_size, pos=[-4,0],  flipVert=True) for x in T1_opt]
+                         size=im_size, pos=pos[i],  flipVert=True) for i, x in enumerate(T1_opt)]
     T2_menu = [ImageStim(AB.win, images[x], name=f'T2 menu {x}',
-                         size=im_size, pos=[4,0],  flipVert=True) for x in T2_opt]
+                         size=im_size, pos=pos[i],  flipVert=True) for i, x in enumerate(T2_opt)]
     # Add specifics to trial_dict
     trial_dict['trial sequence'] = trial_sequence
     trial_dict['trial type'] = 'lag 2'
@@ -139,6 +139,5 @@ for i in range(n_trials):
         trial_dict['T2 correct response'] = 'z'
     else:
         trial_dict['T2 correct response'] = 'm'
-
-    AB.addTrial(trial_dict)
+    AB.addTrial(trial_dict.copy())
 AB.start()

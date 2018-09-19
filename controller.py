@@ -28,6 +28,10 @@ def getSubjectInfo(experiment_name='my name', n_sessions=2, n_runs=2):
     subject_data['run'] = int(input('run: '))
     subject_data['session'] = int(input('session: '))
     return subject_data
+
+    """
+    For some reason, psychopy crashes if I get my info using their GUI
+    """
     # myDlg = gui.Dlg(title=f"{experiment_name} experiment")
     # myDlg.addText('Subject info')
     # myDlg.addField('Subject ID:', 'sub-')
@@ -50,7 +54,7 @@ def getSubjectInfo(experiment_name='my name', n_sessions=2, n_runs=2):
 
 
 class Controller():
-    def __init__(self, subject_id, age, session, run, name='my_experiment', n_sessions=2, n_runs=8):
+    def __init__(self, name='my_experiment', n_sessions=2, n_runs=8):
         """
         Parent class for any type of experiment. Your experiment class needs a
         runTrial-method that will be called from this parent class. Your
@@ -73,11 +77,11 @@ class Controller():
         self.experiment_name = name
         self.n_sessions = n_sessions
         self.n_runs = n_runs
-        #self.subject_info = self.subjectInfo()
-        self.subject_id = subject_id
-        self.age = age
-        self.session = session
-        self.run = run
+        subject_info = getSubjectInfo()
+        self.subject_id = subject_info['subject_id']
+        self.age = subject_info['age']
+        self.session = subject_info['session']
+        self.run = subject_info['run']
         self.logger = self._initLogger()
         self.block = 1
         self.trial = 1

@@ -1,7 +1,8 @@
 from psychopy import gui, visual, event, core
 import sys, logging, os
 from controller import *
-
+from psychopy import logging
+logging.console.setLevel(logging.CRITICAL)
 
 """
 A selection of experiment classes
@@ -40,10 +41,11 @@ class AB(Controller):
         todo:
             add possibility of time limit
         """
-        for obj in obj_list:
-            obj.draw()
-        self.win.flip()
+
         while True:
+            for obj in obj_list:
+                obj.draw()
+            self.win.flip()
             key = event.getKeys()
             if len(key)>0:
                 if key[0] in responses:
