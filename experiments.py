@@ -170,10 +170,3 @@ class AB(Controller):
         self.log(f'End of trial - {self.trial} - block - {self.block}  - '\
                  f'run start - {self.run_start.getTime()} - '\
                  f'block start - {self.block_start.getTime()}')
-
-
-    def addTrial(self, tp):
-        self.trials.append(tp)
-
-    def clearTrials(self):
-        self.trials = []

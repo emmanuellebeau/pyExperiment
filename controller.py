@@ -153,3 +153,9 @@ class Controller(EEGLogging, PupilLogging):
         self.block += 1
         # should we save the trial list as a pkl?
         self.clearTrials()
+    
+    def addTrial(self, tp):
+        self.trials.append(tp)
+
+    def clearTrials(self):
+        self.trials = []

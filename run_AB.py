@@ -72,11 +72,19 @@ def createTrialSequence(AB, T1, T2, t1_pos, t2_pos, images, masks, n_masks, RSVP
                                        size=im_size,  flipVert=True)
     trial_sequence[t2_pos] = ImageStim(AB.win, images[T2], name=f'T2 {T2}', color=bgcolor,
                                        size=im_size,  flipVert=True)
-
     return trial_sequence
 
 # load images
 images = load_images()
+info_txt = loadInfoTxt()
+n_images = len(images)
+n_trials = 5
+t1_pos = 3
+t2_pos = 7
+RSVP_len = 12
+n_masks = 20
+im_size = 5 # in degrees
+n_blocks = 2
 
 #AB = AB(n_sessions=2, n_runs=1)
 AB = AB(name='AB')
@@ -85,13 +93,7 @@ print('initated AB')
 win = visual.Window([800,600], monitor="testMonitor", units="deg")
 AB.win = win
 # generate trials
-n_images = len(images)
-n_trials = 5
-t1_pos = 3
-t2_pos = 7
-RSVP_len = 12
-n_masks = 20
-im_size = 5 # in degrees
+
 
 trial_dict = {
             'trial sequence':None, # list of named psychopy objects to draw
@@ -110,53 +112,57 @@ trial_dict = {
             'T2 correct response': None
             }
 
-masks = createMasks(images, n_masks)
-for i in range(n_trials):
-    T1 = rchoice(range(n_images), 1)[0]
-    T2 = rchoice(range(n_images), 1)[0]
-    trial_sequence = createTrialSequence(AB, T1, T2, t1_pos, t2_pos, images,
-                                         masks, n_masks, RSVP_len, im_size)
-    # Make menu options
-    possible_menu_options = np.setdiff1d(range(n_images), [T1, T2])
-    T1_opt = np.append(rchoice(possible_menu_options, 1), T1)
-    np.random.shuffle(T1_opt)
+for block in range(n_blocks):
+    masks = createMasks(images, n_masks)
+    for i in range(n_trials):
+        T1 = rchoice(range(n_images), 1)[0]
+        T2 = rchoice(range(n_images), 1)[0]
+        trial_sequence = createTrialSequence(AB, T1, T2, t1_pos, t2_pos, images,
+                                             masks, n_masks, RSVP_len, im_size)
+        # Make menu options
+        possible_menu_options = np.setdiff1d(range(n_images), [T1, T2])
+        T1_opt = np.append(rchoice(possible_menu_options, 1), T1)
+        np.random.shuffle(T1_opt)
 
-    T2_opt = np.append(rchoice(possible_menu_options, 1), T2)
-    np.random.shuffle(T2_opt)
+        T2_opt = np.append(rchoice(possible_menu_options, 1), T2)
+        np.random.shuffle(T2_opt)
 
-    # create image instances for menu
-    pos = ([-4, 0], [4, 0])
-    menu_txt = visual.TextStim(win, text='Which one was the first target', pos=(0, 4), height=0.35)
-    menu_txt2 = visual.TextStim(win, text='Which one was the second target', pos=(0, 4), height=0.35)
-    T1_menu = [ImageStim(AB.win, images[x], name=f'T1 menu {x}',
-                         size=im_size, pos=pos[i],  flipVert=True) for i, x in enumerate(T1_opt)]
-    T1_menu.append(menu_txt)
-    T2_menu = [ImageStim(AB.win, images[x], name=f'T2 menu {x}',
-                         size=im_size, pos=pos[i],  flipVert=True) for i, x in enumerate(T2_opt)]
-    T2_menu.append(menu_txt2)
-    # Add specifics to trial_dict
-    trial_dict['trial sequence'] = trial_sequence
-    trial_dict['trial type'] = 'lag 2'
-    trial_dict['T1'] = T1
-    trial_dict['T2'] = T2
-    trial_dict['T1 options'] = T1_opt
-    trial_dict['T2 options'] = T2_opt
-    trial_dict['T1 menu'] = T1_menu
-    trial_dict['T2 menu'] = T2_menu
-    trial_dict['T1 responses'] = ['z', 'm']
-    trial_dict['T2 responses'] = ['z', 'm']
-    if T1_opt[0] == T1:
-        trial_dict['T1 correct response'] = 'z'
+        # create image instances for menu
+        pos = ([-4, 0], [4, 0])
+        menu_txt = visual.TextStim(win, text='Which one was the first target', pos=(0, 4), height=0.5)
+        menu_txt2 = visual.TextStim(win, text='Which one was the second target', pos=(0, 4), height=0.5)
+        T1_menu = [ImageStim(AB.win, images[x], name=f'T1 menu {x}',
+                             size=im_size, pos=pos[i],  flipVert=True) for i, x in enumerate(T1_opt)]
+        T1_menu.append(menu_txt)
+        T2_menu = [ImageStim(AB.win, images[x], name=f'T2 menu {x}',
+                             size=im_size, pos=pos[i],  flipVert=True) for i, x in enumerate(T2_opt)]
+        T2_menu.append(menu_txt2)
+        # Add specifics to trial_dict
+        trial_dict['trial sequence'] = trial_sequence
+        trial_dict['trial type'] = 'lag 2'
+        trial_dict['T1'] = T1
+        trial_dict['T2'] = T2
+        trial_dict['T1 options'] = T1_opt
+        trial_dict['T2 options'] = T2_opt
+        trial_dict['T1 menu'] = T1_menu
+        trial_dict['T2 menu'] = T2_menu
+        trial_dict['T1 responses'] = ['z', 'm']
+        trial_dict['T2 responses'] = ['z', 'm']
+        if T1_opt[0] == T1:
+            trial_dict['T1 correct response'] = 'z'
+        else:
+            trial_dict['T1 correct response'] = 'm'
+
+        if T2_opt[0] == T2:
+            trial_dict['T2 correct response'] = 'z'
+        else:
+            trial_dict['T2 correct response'] = 'm'
+        AB.addTrial(trial_dict.copy())
+
+    if block == 0:
+        info_message = visual.TextStim(win, text=info_txt, pos=(0, 0), height=0.5)
     else:
-        trial_dict['T1 correct response'] = 'm'
-
-    if T2_opt[0] == T2:
-        trial_dict['T2 correct response'] = 'z'
-    else:
-        trial_dict['T2 correct response'] = 'm'
-    AB.addTrial(trial_dict.copy())
-
-info_txt = loadInfoTxt()
-info_message = visual.TextStim(win, text=info_txt, pos=(0, 0), height=0.35)
-params = {'obj_list': [info_message], 'responses': ['space']}
-AB.start(runBefore=[(AB.drawAndWait, params)])
+        block_txt = f'End of block {block+1}\npress space to continue'
+        info_message = visual.TextStim(win, text=block_txt, pos=(0, 0), height=0.5)
+    params = {'obj_list': [info_message], 'responses': ['space']}
+    AB.start(runBefore=[(AB.drawAndWait, params)])
