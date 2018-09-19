@@ -60,7 +60,6 @@ win = visual.Window([800,600], monitor="testMonitor", units="deg")
 AB.win = win
 # generate trials
 
-
 trial_dict = {
             'trial sequence':None, # list of named psychopy objects to draw
             'fixation time': 0.5,

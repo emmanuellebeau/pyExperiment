@@ -1,1 +1,5 @@
-In this task, you will be presented with series of objects (scrambled or unscrambled) in the centre of the screen. Please pay attention to the object stream and keep fixating at the centre of the screen. There are 2 target objects (unscrambled) embedded in a stream of scrambled ones in each trial. At the end of the stream, you will be presented with a one word, and you have to decide if this word corresponds to the first target by pressing Z for YES and M for NO. Following this, you will then be presented with a new word and asked the same for the second target. Press the spacebar to start the experiment.
+In this task, you will be presented with series of objects in the centre of the screen. Please pay attention to the object stream and keep fixating at the centre of the screen. There are 2 target objects embedded in a stream in each trial.
+
+At the end of the stream, you will be presented with two options, press either Z or M to indicate the correct target.
+
+Press space to start
