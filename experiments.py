@@ -32,7 +32,7 @@ class AB(Controller):
     def __init_(self, **args):
         Controller.__init__(self, **args)
 
-    def drawAndWait(self, obj_list, responses=[]):
+    def drawAndWait(self, obj_list, responses=[], max_time=False):
         """
         parameters
             obj: list of psychopy object with draw method
@@ -41,16 +41,20 @@ class AB(Controller):
         todo:
             add possibility of time limit
         """
-
+        event.clearEvents()
+        start = core.Clock()
         while True:
-            for obj in obj_list:
-                obj.draw()
-            self.win.flip()
+            if start > max_time:
+                return 'time out'
             key = event.getKeys()
             if len(key)>0:
                 if key[0] in responses:
                     return key[0]
             event.clearEvents()
+            for obj in obj_list:
+                obj.draw()
+            self.win.flip()
+
 
     def initTrialLog(self):
         """
@@ -115,7 +119,7 @@ class AB(Controller):
         Todo:
             Make sure timing is correct depending on refresh rate
         """
-        #start = self.run_start.getTime()
+        # start trial clock
         trial_start = core.Clock()
 
         # log trial start
@@ -170,3 +174,10 @@ class AB(Controller):
         self.log(f'End of trial - {self.trial} - run - {self.run}  - '\
                  f'run start - {self.run_start.getTime()} - '\
                  f'run start - {self.run_start.getTime()}')
+
+
+def f(x, y):
+    print(x, y)
+
+params = {'x':5, 'y':7}
+f(**params)

@@ -90,7 +90,7 @@ n_blocks = 2
 AB = AB(name='AB')
 AB.initTrialLog()
 print('initated AB')
-win = visual.Window([800,600], monitor="testMonitor", units="deg")
+win = visual.Window([800,600], fullscr=True, monitor="testMonitor", units="deg")
 AB.win = win
 # generate trials
 
@@ -118,7 +118,7 @@ for block in range(n_blocks):
         info_message = visual.TextStim(win, text=info_txt, pos=(0, 0), height=0.5)
         params = {'obj_list': [info_message], 'responses': ['space']}
         AB.drawAndWait(**params)
-    
+
     masks = createMasks(images, n_masks)
     for i in range(n_trials):
         T1 = rchoice(range(n_images), 1)[0]
