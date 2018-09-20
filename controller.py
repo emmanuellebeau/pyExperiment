@@ -73,7 +73,6 @@ class Controller(EEGLogging, PupilLogging):
         Todo:
             * TODO - a lot
         """
-        pass
         self.experiment_name = name
         self.n_sessions = n_sessions
         self.n_runs = n_runs
