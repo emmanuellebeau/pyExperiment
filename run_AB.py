@@ -78,7 +78,7 @@ def createTrialSequence(AB, T1, T2, t1_pos, t2_pos, images, masks, n_masks, RSVP
 images = load_images()
 info_txt = loadInfoTxt()
 n_images = len(images)
-n_trials = 3
+n_trials = 20
 t1_pos = 5
 t2_pos = 7
 RSVP_len = 12
@@ -91,7 +91,7 @@ max_response_time = 2.5
 AB = AB(name='AB')
 AB.initTrialLog()
 print('initated AB')
-win = visual.Window([800,600], fullscr=True, monitor="testMonitor", units="deg")
+win = visual.Window([800,600], fullscr=True, screen=2, monitor="testMonitor", units="deg")
 AB.win = win
 # generate trials
 
@@ -123,6 +123,7 @@ for block in range(n_blocks):
 
     masks = createMasks(images, n_masks)
     for i in range(n_trials):
+        AB.progressBar(i, n_trials, load_txt=f'Loading trials for block {block+1}')
         T1 = rchoice(range(n_images), 1)[0]
         T2 = rchoice(range(n_images), 1)[0]
         trial_sequence = createTrialSequence(AB, T1, T2, t1_pos, t2_pos, images,

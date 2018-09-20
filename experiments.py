@@ -7,6 +7,9 @@ logging.console.setLevel(logging.CRITICAL)
 """
 A selection of experiment classes
 """
+def shutdown(exp):
+    exp.win.close()
+    core.quit()
 
 class bareBoneExperiment(Controller):
     """
@@ -32,6 +35,15 @@ class AB(Controller):
     def __init_(self, **args):
         Controller.__init__(self, **args)
 
+    def get_keypress(self):
+        keys = event.getKeys()
+        if keys:
+            if keys[0] in ['q', 'esc']:
+                shutdown(self)
+            return keys[0]
+        else:
+            return False
+
     def drawAndWait(self, obj_list, responses=[], max_time=False):
         """
         parameters
@@ -47,10 +59,9 @@ class AB(Controller):
             if max_time:
                 if start.getTime() > max_time:
                     return 'time out'
-            key = event.getKeys()
-            if len(key)>0:
-                if key[0] in responses:
-                    return key[0]
+            key = self.get_keypress()
+            if key and key in responses:
+                return key
             event.clearEvents()
             for obj in obj_list:
                 obj.draw()
@@ -91,12 +102,22 @@ class AB(Controller):
         with open(self.trial_log_name, 'a') as f:
             f.write('\t'.join(trial_info) + '\n')
 
-    def progressBar(self):
+    def progressBar(self, i, n, load_txt='Loading'):
         """
-        Todo:
-            Make progress bar
+        Progress bar for AB
         """
-        pass
+        percentage_done = i/n*50
+
+        load_info = visual.TextStim(self.win, text=load_txt, pos=(0, 1), height=0.6)
+        bar = '[{0}{1}]'.format('-'*int(percentage_done),
+                                ' '*(50-int(percentage_done)))
+        progress_bar = visual.TextStim(self.win, text=bar, pos=(0, 0), height=0.6)
+        percent_text = f'{percentage_done*2:.2f} % done'
+        percentage = visual.TextStim(self.win, text=percent_text, pos=(0, -1), height=0.6)
+        load_info.draw()
+        progress_bar.draw()
+        percentage.draw()
+        self.win.flip()
 
     def runTrial(self, tp):
         """
@@ -136,6 +157,7 @@ class AB(Controller):
 
         # begin RSVP
         for i, im in enumerate(tp['trial sequence']):
+            self.get_keypress()
             im.draw()
             self.win.flip()
             self.log(f'RSVP - {im.name} - trial - {self.trial} - run - '\
