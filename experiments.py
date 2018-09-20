@@ -67,7 +67,7 @@ class AB(Controller):
             os.mkdir('results')
 
         # create log file
-        header = ['Subject', 'TrialType', 'Session', 'Block', 'Trial', 'T1',
+        header = ['Subject', 'TrialType', 'Session', 'run', 'Trial', 'T1',
                   'T2', 'T1menu', 'T2menu', 'T1rest', 'T2resp',
                   'T1RT', 'T2RT', 'T1hit', 'T2hit']
         with open(self.trial_log_name, 'w') as f:
@@ -78,7 +78,7 @@ class AB(Controller):
         Updates the trial log used
         """
         trial_info = [self.subject_id, tp['trial type'], self.session,
-                      self.block, self.trial, tp['T1'], tp['T2'],
+                      self.run, self.trial, tp['T1'], tp['T2'],
                       tp['T1 options'], tp['T2 options'], self.t1_response,
                       self.t2_response, self.t1_rt, self.t2_rt,
                       tp['t1_hit'], tp['t2_hit']]
@@ -115,13 +115,13 @@ class AB(Controller):
         Todo:
             Make sure timing is correct depending on refresh rate
         """
-        #start = self.block_start.getTime()
+        #start = self.run_start.getTime()
         trial_start = core.Clock()
 
         # log trial start
-        self.log(f'Start of trial - {self.trial} - block - {self.block}  - '\
+        self.log(f'Start of trial - {self.trial} - run - {self.run}  - '\
                  f'run start - {self.run_start.getTime()} - '\
-                 f'block start - {self.block_start.getTime()}')
+                 f'run start - {self.run_start.getTime()}')
 
         # show fixation
         fixation = visual.GratingStim(win=self.win, size=0.4, pos=[0,0], sf=0, rgb=-1)
@@ -133,9 +133,9 @@ class AB(Controller):
         for i, im in enumerate(tp['trial sequence']):
             im.draw()
             self.win.flip()
-            self.log(f'RSVP - {im.name} - trial - {self.trial} - block - '\
-                     f'{self.block}  - trial start - {trial_start.getTime()}'\
-                     f' - block start - {self.block_start.getTime()} - '\
+            self.log(f'RSVP - {im.name} - trial - {self.trial} - run - '\
+                     f'{self.run}  - trial start - {trial_start.getTime()}'\
+                     f' - run start - {self.run_start.getTime()} - '\
                      f'run start - {self.run_start.getTime()}')
             core.wait(tp['imgdur'])
             self.win.flip()
@@ -149,14 +149,14 @@ class AB(Controller):
         # draw menu
         timer = core.Clock()
         self.log(f'T1 menu - {self.subject_id} - {self.trial} -  '\
-                 f'{self.block} - {self.block_start.getTime()} - '\
+                 f'{self.run} - {self.run_start.getTime()} - '\
                  f'{trial_start.getTime()}')
         self.t1_response = self.drawAndWait(tp['T1 menu'], responses=tp['T1 responses'])
         self.t1_rt = timer.getTime()
 
         timer = core.Clock()
         self.log(f'T2 menu - {self.subject_id} - {self.trial} -  '\
-                 f'{self.block} - {self.block_start.getTime()} - '\
+                 f'{self.run} - {self.run_start.getTime()} - '\
                  f'{trial_start.getTime()}')
         self.t2_response = self.drawAndWait(tp['T2 menu'], responses=tp['T2 responses'])
         self.t2_rt = timer.getTime()
@@ -167,6 +167,6 @@ class AB(Controller):
         # save trial data
         self.updateTrialLog(tp)
 
-        self.log(f'End of trial - {self.trial} - block - {self.block}  - '\
+        self.log(f'End of trial - {self.trial} - run - {self.run}  - '\
                  f'run start - {self.run_start.getTime()} - '\
-                 f'block start - {self.block_start.getTime()}')
+                 f'run start - {self.run_start.getTime()}')

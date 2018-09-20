@@ -78,7 +78,7 @@ def createTrialSequence(AB, T1, T2, t1_pos, t2_pos, images, masks, n_masks, RSVP
 images = load_images()
 info_txt = loadInfoTxt()
 n_images = len(images)
-n_trials = 5
+n_trials = 3
 t1_pos = 5
 t2_pos = 7
 RSVP_len = 12
@@ -160,9 +160,21 @@ for block in range(n_blocks):
         AB.addTrial(trial_dict.copy())
 
     if block == 0:
+        # if its the first block, present instructions first
         info_message = visual.TextStim(win, text=info_txt, pos=(0, 0), height=0.5)
-    else:
-        block_txt = f'End of block {block}\npress space to continue'
+        params1 = {'obj_list': [info_message], 'responses': ['space']}
+        block_txt = f'End of block {block+1}/{n_blocks}\nPress space to continue'
         info_message = visual.TextStim(win, text=block_txt, pos=(0, 0), height=0.5)
-    params = {'obj_list': [info_message], 'responses': ['space']}
-    AB.start(runBefore=[(AB.drawAndWait, params)])
+        params2 = {'obj_list': [info_message], 'responses': ['space']}
+        AB.start(run_before=[(AB.drawAndWait, params1)],
+                 run_after=[(AB.drawAndWait, params2)])
+    else:
+        if block == n_blocks-1:
+            block_txt = f'End of run {AB.run}\npress space to continue'
+            info_message = visual.TextStim(win, text=block_txt, pos=(0, 0), height=0.5)
+        else:
+            print('this block', block)
+            block_txt = f'End of block {block+1}/{n_blocks}\nPress space to continue'
+            info_message = visual.TextStim(win, text=block_txt, pos=(0, 0), height=0.5)
+        params = {'obj_list': [info_message], 'responses': ['space']}
+        AB.start(run_after=[(AB.drawAndWait, params)])

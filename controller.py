@@ -124,7 +124,7 @@ class Controller(EEGLogging, PupilLogging):
         elif level=='error':
             self.logger.error(text)
 
-    def start(self, runBefore=False, runAfter=False):
+    def start(self, run_before=False, run_after=False):
         """
         parameters
             runBefore / runAfter: list [(function, dict of parameters)]
@@ -132,8 +132,8 @@ class Controller(EEGLogging, PupilLogging):
                 the trials. For example, a function that displays information
                 regarding the experiment or other.
         """
-        if runBefore:
-            for f, para in runBefore:
+        if run_before:
+            for f, para in run_before:
                 f(**para)
 
         # loop over trials
@@ -143,8 +143,8 @@ class Controller(EEGLogging, PupilLogging):
             self.runTrial(this_trial)
             self.trial += 1
 
-        if runAfter:
-            for f, para in runAfter:
+        if run_after:
+            for f, para in run_after:
                 f(**para)
 
         log_str = f'End of block - {self.block} - '\
@@ -153,7 +153,7 @@ class Controller(EEGLogging, PupilLogging):
         self.block += 1
         # should we save the trial list as a pkl?
         self.clearTrials()
-    
+
     def addTrial(self, tp):
         self.trials.append(tp)
 
