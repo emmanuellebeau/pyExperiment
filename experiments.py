@@ -44,8 +44,9 @@ class AB(Controller):
         event.clearEvents()
         start = core.Clock()
         while True:
-            if start > max_time:
-                return 'time out'
+            if max_time:
+                if start.getTime() > max_time:
+                    return 'time out'
             key = event.getKeys()
             if len(key)>0:
                 if key[0] in responses:
@@ -155,14 +156,18 @@ class AB(Controller):
         self.log(f'T1 menu - {self.subject_id} - {self.trial} -  '\
                  f'{self.run} - {self.run_start.getTime()} - '\
                  f'{trial_start.getTime()}')
-        self.t1_response = self.drawAndWait(tp['T1 menu'], responses=tp['T1 responses'])
+        self.t1_response = self.drawAndWait(tp['T1 menu'],
+                                            responses=tp['T1 responses'],
+                                            max_time=tp['max response time'])
         self.t1_rt = timer.getTime()
 
         timer = core.Clock()
         self.log(f'T2 menu - {self.subject_id} - {self.trial} -  '\
                  f'{self.run} - {self.run_start.getTime()} - '\
                  f'{trial_start.getTime()}')
-        self.t2_response = self.drawAndWait(tp['T2 menu'], responses=tp['T2 responses'])
+        self.t2_response = self.drawAndWait(tp['T2 menu'],
+                                            responses=tp['T2 responses'],
+                                            max_time=tp['max response time'])
         self.t2_rt = timer.getTime()
 
         tp['t1_hit'] = tp['T1 correct response'] == self.t1_response
@@ -174,10 +179,3 @@ class AB(Controller):
         self.log(f'End of trial - {self.trial} - run - {self.run}  - '\
                  f'run start - {self.run_start.getTime()} - '\
                  f'run start - {self.run_start.getTime()}')
-
-
-def f(x, y):
-    print(x, y)
-
-params = {'x':5, 'y':7}
-f(**params)

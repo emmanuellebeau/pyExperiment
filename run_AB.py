@@ -85,6 +85,7 @@ RSVP_len = 12
 n_masks = 20
 im_size = 5 # in degrees
 n_blocks = 2
+max_response_time = 2.5
 
 #AB = AB(n_sessions=2, n_runs=1)
 AB = AB(name='AB')
@@ -100,6 +101,7 @@ trial_dict = {
             'fixation time': 0.5,
             'imgdur': 0.02,
             'SOA': 0.1,
+            'max response time': max_response_time,
             'T1': None,
             'T2': None,
             'T1 options': None,
@@ -169,7 +171,6 @@ for block in range(n_blocks):
         block_txt = f'End of run {AB.run}\npress space to continue'
         info_message = visual.TextStim(win, text=block_txt, pos=(0, 0), height=0.5)
     else:
-        print('this block', block)
         block_txt = f'End of block {block+1}/{n_blocks}\nPress space to continue'
         info_message = visual.TextStim(win, text=block_txt, pos=(0, 0), height=0.5)
     params = {'obj_list': [info_message], 'responses': ['space']}
