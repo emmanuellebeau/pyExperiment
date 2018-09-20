@@ -113,6 +113,12 @@ trial_dict = {
             }
 
 for block in range(n_blocks):
+    if block == 0:
+        # if the first block, show instructions
+        info_message = visual.TextStim(win, text=info_txt, pos=(0, 0), height=0.5)
+        params = {'obj_list': [info_message], 'responses': ['space']}
+        AB.drawAndWait(**params)
+    
     masks = createMasks(images, n_masks)
     for i in range(n_trials):
         T1 = rchoice(range(n_images), 1)[0]
@@ -159,22 +165,12 @@ for block in range(n_blocks):
             trial_dict['T2 correct response'] = 'm'
         AB.addTrial(trial_dict.copy())
 
-    if block == 0:
-        # if its the first block, present instructions first
-        info_message = visual.TextStim(win, text=info_txt, pos=(0, 0), height=0.5)
-        params1 = {'obj_list': [info_message], 'responses': ['space']}
+    if block == n_blocks-1:
+        block_txt = f'End of run {AB.run}\npress space to continue'
+        info_message = visual.TextStim(win, text=block_txt, pos=(0, 0), height=0.5)
+    else:
+        print('this block', block)
         block_txt = f'End of block {block+1}/{n_blocks}\nPress space to continue'
         info_message = visual.TextStim(win, text=block_txt, pos=(0, 0), height=0.5)
-        params2 = {'obj_list': [info_message], 'responses': ['space']}
-        AB.start(run_before=[(AB.drawAndWait, params1)],
-                 run_after=[(AB.drawAndWait, params2)])
-    else:
-        if block == n_blocks-1:
-            block_txt = f'End of run {AB.run}\npress space to continue'
-            info_message = visual.TextStim(win, text=block_txt, pos=(0, 0), height=0.5)
-        else:
-            print('this block', block)
-            block_txt = f'End of block {block+1}/{n_blocks}\nPress space to continue'
-            info_message = visual.TextStim(win, text=block_txt, pos=(0, 0), height=0.5)
-        params = {'obj_list': [info_message], 'responses': ['space']}
-        AB.start(run_after=[(AB.drawAndWait, params)])
+    params = {'obj_list': [info_message], 'responses': ['space']}
+    AB.start(run_after=[(AB.drawAndWait, params)])

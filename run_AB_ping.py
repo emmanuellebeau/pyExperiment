@@ -78,15 +78,20 @@ trial_dict = {
             }
 
 empty = visual.GratingStim(AB.win, size=0, name='empty')
-ping = RadialStim(AB.win, mask='gauss', size=6, radialCycles=0,
+ping = RadialStim(AB.win, mask='circle', size=6, radialCycles=0,
                  angularCycles=0, color=(-1, -1, -1), name='ping')
 for block in range(n_blocks):
+    if block == 0:
+        # if the first block, show instructions
+        info_message = visual.TextStim(win, text=info_txt, pos=(0, 0), height=0.5)
+        params = {'obj_list': [info_message], 'responses': ['space']}
+        AB.drawAndWait(**params)
     masks = createMasks(win, n_masks)
     for i in range(n_trials):
         T1 = rchoice((45, -45), 1)[0]
         T2 = rchoice((45, -45), 1)[0]
         trial_sequence = createTrialSequence(AB, T1, T2, t1_pos, t2_pos, masks, n_masks, RSVP_len)
-        addage = [empty, empty, ping, ping]
+        addage = [empty, empty, empty, ping]
         trial_sequence.extend(addage)
         # Make menu options
         T1_opt = np.array([45, -45])
@@ -127,22 +132,12 @@ for block in range(n_blocks):
             trial_dict['T2 correct response'] = 'm'
         AB.addTrial(trial_dict.copy())
 
-    if block == 0:
-        # if its the first block, present instructions first
-        info_message = visual.TextStim(win, text=info_txt, pos=(0, 0), height=0.5)
-        params1 = {'obj_list': [info_message], 'responses': ['space']}
-        block_txt = f'End of block {block+1}\{n_blocks}\npress space to continue'
+    if block == n_blocks-1:
+        block_txt = f'End of run {AB.run}\npress space to continue'
         info_message = visual.TextStim(win, text=block_txt, pos=(0, 0), height=0.5)
-        params2 = {'obj_list': [info_message], 'responses': ['space']}
-        AB.start(run_before=[(AB.drawAndWait, params1)],
-                 run_after=[(AB.drawAndWait, params2)])
     else:
-        if block == n_blocks-1:
-            block_txt = f'End of run {AB.run}\npress space to continue'
-            info_message = visual.TextStim(win, text=block_txt, pos=(0, 0), height=0.5)
-        else:
-            print('this block', block)
-            block_txt = f'End of block {block+1}\{n_blocks}\npress space to continue'
-            info_message = visual.TextStim(win, text=block_txt, pos=(0, 0), height=0.5)
-        params = {'obj_list': [info_message], 'responses': ['space']}
-        AB.start(run_after=[(AB.drawAndWait, params)])
+        print('this block', block)
+        block_txt = f'End of block {block+1}/{n_blocks}\nPress space to continue'
+        info_message = visual.TextStim(win, text=block_txt, pos=(0, 0), height=0.5)
+    params = {'obj_list': [info_message], 'responses': ['space']}
+    AB.start(run_after=[(AB.drawAndWait, params)])
