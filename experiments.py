@@ -7,9 +7,37 @@ logging.console.setLevel(logging.CRITICAL)
 """
 A selection of experiment classes
 """
-def shutdown(exp):
-    exp.win.close()
+def shutdown(class_obj):
+    class_obj.win.close()
     core.quit()
+
+def get_keypress(class_obj):
+    keys = event.getKeys()
+    if keys:
+        if keys[0] in ['q', 'esc']:
+            shutdown(class_obj)
+        return keys[0]
+    else:
+        return False
+
+
+def progressBar(class_obj, i, n, load_txt='Loading'):
+    """
+    Progress bar
+    """
+    load_info = visual.TextStim(class_obj.win, text=load_txt, pos=(0, 1), height=0.6)
+    # make progress bar
+    percentage_done = i/n*100
+    w = percentage_done/10
+    x_pos = -4.5 + w*0.5
+    progress_bar = visual.Rect(class_obj.win, width=w, height=0.5, pos=(x_pos, -4), fillColor="white")
+    # print percentage done
+    percent_text = f'{percentage_done:.2f} % done'
+    percentage = visual.TextStim(class_obj.win, text=percent_text, pos=(0, -1), height=0.6)
+    load_info.draw()
+    progress_bar.draw()
+    percentage.draw()
+    class_obj.win.flip()
 
 class bareBoneExperiment(Controller):
     """
@@ -33,40 +61,7 @@ class AB(Controller):
         Write this doc string
     """
     def __init_(self, **args):
-        Controller.__init__(self, **args)
-
-    def get_keypress(self):
-        keys = event.getKeys()
-        if keys:
-            if keys[0] in ['q', 'esc']:
-                shutdown(self)
-            return keys[0]
-        else:
-            return False
-
-    def drawAndWait(self, obj_list, responses=[], max_time=False):
-        """
-        parameters
-            obj: list of psychopy object with draw method
-            responses: list
-                list of keywords that will exit the loop
-        todo:
-            add possibility of time limit
-        """
-        event.clearEvents()
-        start = core.Clock()
-        while True:
-            if max_time:
-                if start.getTime() > max_time:
-                    return 'time out'
-            key = self.get_keypress()
-            if key and key in responses:
-                return key
-            event.clearEvents()
-            for obj in obj_list:
-                obj.draw()
-            self.win.flip()
-
+        Controller().__init__(self, **args)
 
     def initTrialLog(self):
         """
@@ -102,23 +97,28 @@ class AB(Controller):
         with open(self.trial_log_name, 'a') as f:
             f.write('\t'.join(trial_info) + '\n')
 
-    def progressBar(self, i, n, load_txt='Loading'):
+    def drawAndWait(self, obj_list, responses=[], max_time=False):
         """
-        Progress bar for AB and other things
+        parameters
+            obj: list of psychopy object with draw method
+            responses: list
+                list of keywords that will exit the loop
+        todo:
+            add possibility of time limit
         """
-        load_info = visual.TextStim(self.win, text=load_txt, pos=(0, 1), height=0.6)
-        # make progress bar
-        percentage_done = i/n*100
-        w = percentage_done/10
-        x_pos = -4.5 + w*0.5
-        progress_bar = visual.Rect(self.win, width=w, height=0.5, pos=(x_pos, -4), fillColor="white")
-        # print percentage done
-        percent_text = f'{percentage_done:.2f} % done'
-        percentage = visual.TextStim(self.win, text=percent_text, pos=(0, -1), height=0.6)
-        load_info.draw()
-        progress_bar.draw()
-        percentage.draw()
-        self.win.flip()
+        event.clearEvents()
+        start = core.Clock()
+        while True:
+            if max_time:
+                if start.getTime() > max_time:
+                    return 'time out'
+            key = get_keypress(self)
+            if key and key in responses:
+                return key
+            event.clearEvents()
+            for obj in obj_list:
+                obj.draw()
+            self.win.flip()
 
     def runTrial(self, tp):
         """
@@ -158,7 +158,7 @@ class AB(Controller):
 
         # begin RSVP
         for i, im in enumerate(tp['trial sequence']):
-            self.get_keypress()
+            get_keypress(self)
             im.draw()
             self.win.flip()
             self.log(f'RSVP - {im.name} - trial - {self.trial} - run - '\

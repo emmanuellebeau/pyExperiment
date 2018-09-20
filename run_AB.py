@@ -87,7 +87,6 @@ im_size = 5 # in degrees
 n_blocks = 2
 max_response_time = 2.5
 
-#AB = AB(n_sessions=2, n_runs=1)
 AB = AB(name='AB')
 AB.initTrialLog()
 print('initated AB')
@@ -123,7 +122,7 @@ for block in range(n_blocks):
 
     masks = createMasks(images, n_masks)
     for i in range(n_trials):
-        AB.progressBar(i, n_trials, load_txt=f'Loading trials for block {block+1}')
+        progressBar(AB, i, n_trials, load_txt=f'Loading trials for block {block+1}')
         T1 = rchoice(range(n_images), 1)[0]
         T2 = rchoice(range(n_images), 1)[0]
         trial_sequence = createTrialSequence(AB, T1, T2, t1_pos, t2_pos, images,
