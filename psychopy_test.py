@@ -7,6 +7,13 @@ import os
 win = visual.Window([800,600],monitor="testMonitor", units="deg")
 rad = visual.RadialStim(win, mask='gauss', pos=(-4, 0), size=6, radialCycles=5, angularCycles=5, ori=45)
 myGabor = visual.GratingStim(win,  mask='gauss', pos=(4, 0), size=6, ori=45, sf=5)  # gives a 'Gabor'
+rect = visual.Rect(win, width=10, height=0.5, pos=(0, 4), fillColor="white")
+
+w = 3.5
+x_pos = -5 + w*0.5
+rect2 = visual.Rect(win, width=w, height=0.5, pos=(x_pos, -4), fillColor="white")
+rect.draw()
+rect2.draw()
 rad.draw()
 myGabor.draw()
 win.flip()

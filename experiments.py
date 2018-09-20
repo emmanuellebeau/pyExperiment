@@ -106,13 +106,14 @@ class AB(Controller):
         """
         Progress bar for AB
         """
-        percentage_done = i/n*50
-
         load_info = visual.TextStim(self.win, text=load_txt, pos=(0, 1), height=0.6)
-        bar = '[{0}{1}]'.format('-'*int(percentage_done),
-                                ' '*(50-int(percentage_done)))
-        progress_bar = visual.TextStim(self.win, text=bar, pos=(0, 0), height=0.6)
-        percent_text = f'{percentage_done*2:.2f} % done'
+        # make progress bar
+        percentage_done = i/n*100
+        w = percentage_done/10
+        x_pos = -4.5 + w*0.5
+        progress_bar = visual.Rect(self.win, width=w, height=0.5, pos=(x_pos, -4), fillColor="white")
+        # print percentage done
+        percent_text = f'{percentage_done:.2f} % done'
         percentage = visual.TextStim(self.win, text=percent_text, pos=(0, -1), height=0.6)
         load_info.draw()
         progress_bar.draw()
