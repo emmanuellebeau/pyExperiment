@@ -5,6 +5,7 @@ Use python 3.6+ and the newest psychopy
 
 TODO:
   - Add support for EEG and Pupil in the Controller
+  - Fix timing issues in AB
   - Fix that gui for fetching subject data (running the psychopy gui method makes it all crash)
   - Fix the monitor settings
   - Add stop time option for drawAndWait()
