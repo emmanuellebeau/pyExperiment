@@ -104,7 +104,7 @@ class AB(Controller):
 
     def progressBar(self, i, n, load_txt='Loading'):
         """
-        Progress bar for AB
+        Progress bar for AB and other things
         """
         load_info = visual.TextStim(self.win, text=load_txt, pos=(0, 1), height=0.6)
         # make progress bar
