@@ -8,7 +8,6 @@ TODO:
   - Fix timing issues in AB
   - Fix that gui for fetching subject data (running the psychopy gui method makes it all crash)
   - Fix the monitor settings
-  - Add stop time option for drawAndWait()
   - Docstrings
   - Make a nice progress bar method
   - Go over the messages being logged
