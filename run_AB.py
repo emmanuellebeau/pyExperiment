@@ -79,7 +79,7 @@ images = load_images()
 info_txt = loadInfoTxt()
 n_images = len(images)
 n_trials = 5
-t1_pos = 3
+t1_pos = 5
 t2_pos = 7
 RSVP_len = 12
 n_masks = 20
@@ -162,7 +162,7 @@ for block in range(n_blocks):
     if block == 0:
         info_message = visual.TextStim(win, text=info_txt, pos=(0, 0), height=0.5)
     else:
-        block_txt = f'End of block {block+1}\npress space to continue'
+        block_txt = f'End of block {block}\npress space to continue'
         info_message = visual.TextStim(win, text=block_txt, pos=(0, 0), height=0.5)
     params = {'obj_list': [info_message], 'responses': ['space']}
     AB.start(runBefore=[(AB.drawAndWait, params)])
