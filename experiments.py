@@ -1,4 +1,5 @@
 from psychopy import gui, visual, event, core
+import numpy as np
 import sys, logging, os
 from controller import *
 from psychopy import logging
@@ -64,6 +65,8 @@ class AB(Controller):
         self.win = visual.Window([1024,768], fullscr=fullscr, screen=1,
                                  monitor=monitor, units="deg")
         self.win.mouseVisible = False
+        self.secs_per_frame = 1/self.win.getActualFrameRate()
+        self.T1_accuracy = 0
         self._initTrialLog()
 
     def _initTrialLog(self):
@@ -166,18 +169,31 @@ class AB(Controller):
         self.win.flip()
         core.wait(tp['fixation time'])
 
-        # begin RSVP
-        self.formattedLog('Start of RSVP')
-        for i, im in enumerate(tp['trial sequence']):
-            get_keypress(self)
-            im.setPos((0, 0))
-            im.draw()
-            self.win.flip()
-            self.formattedLog(f'RSVP {im.name}')
-            core.wait(tp['img duration'])
-            self.win.flip()
-            core.wait(tp['SOA'])
 
+        # frames per image
+        f_per_img = int(tp['img duration']/self.secs_per_frame)
+        # frames per SOA
+        f_SOA = int(tp['SOA']/self.secs_per_frame)
+        # total frames
+        n_frames = f_SOA*len(tp['trial sequence'])
+        frames = np.arange(n_frames)
+
+        # begin RSVP
+        i = 0
+        # just to make sure we aren't sending the same log message twice
+        _i = -1
+        self.formattedLog('Start of RSVP')
+        for frame in frames:
+            if frame in frames[::f_SOA]:
+                im = tp['trial sequence'][i]
+                im.setPos((0, 0))
+                im.draw()
+                if _i != i:
+                    self.formattedLog(f'RSVP {im.name}')
+                    _i = i
+            if frame in frames[f_per_img::f_SOA]:
+                i += 1
+            self.win.flip()
         self.formattedLog('End of RSVP')
 
         # fixation before menu
@@ -207,6 +223,9 @@ class AB(Controller):
 
         self.t1_hit = tp['T1 correct response'] == self.t1_response
         self.t2_hit = tp['T2 correct response'] == self.t2_response
+
+        # calculate T1 accuracy so far
+        self.T1_accuracy = (self.T1_accuracy*(self.trial-1)+int(self.t1_hit))/self.trial
 
         # save trial data
         self.updateTrialLog(tp)

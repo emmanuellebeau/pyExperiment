@@ -1,5 +1,5 @@
-from psychopy.visual import ImageStim
 from psychopy import visual, event, core
+from psychopy.visual import ImageStim
 import os
 import numpy as np
 from numpy.random import choice as rchoice
@@ -14,9 +14,9 @@ TODO:
 
 # define trial settings
 fix_time = 0.5
-img_dur = 0.012
+img_dur = 0.02
 SOA = 0.1
-n_trials = 10 # per block
+n_trials = 5 # per block
 t1_pos = 5
 t2_pos = 7
 RSVP_len = 12
@@ -24,6 +24,7 @@ n_masks = 20
 im_size = 8 # in degrees
 n_blocks = 2
 max_response_time = 2.5
+
 """
 Keys should be in order for your response menu
 the first key corresponds to the first alternative in the menu
@@ -57,7 +58,7 @@ ab = AB(distance_to_screen=200, name='AB')
 """
 Preload images and the masks turn them into textures
 """
-info_txt = RU.loadInfoTxt()
+info_txt = RU.loadInfoTxt('instructions.txt')
 
 # Load images
 images = RU.load_AB_images()
@@ -141,8 +142,10 @@ for block in range(n_blocks):
                                        pos=(0, 0), height=0.5)
     else:
         block_txt = f'End of block {block+1}/{n_blocks}\n'\
-                     f'Press space to continue'
+                    f'Press space to continue'
         info_message = visual.TextStim(ab.win, text=block_txt,
                                        pos=(0, 0), height=0.5)
     params = {'obj_list': [info_message], 'responses': ['space']}
     ab.start(run_after=[(ab.drawAndWait, params)])
+    ab.formattedLog(f'T1 accuracy {ab.T1_accuracy*100:.2f} % correct')
+    ab.T1_accuracy = 0
