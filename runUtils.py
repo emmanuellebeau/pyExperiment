@@ -12,7 +12,7 @@ TODO:
     fix dialogue box for getting responses
 """
 
-def load_images():
+def load_AB_images():
     STIM_FOLDER = 'stim/'
     images = []
     for im in range(1, 41):
@@ -27,9 +27,9 @@ def load_images():
 def getCorrectResponse(opt, t, keys):
     return keys[list(opt).index(t)]
 
-def loadInfoTxt():
+def loadInfoTxt(file_path='instructions.txt'):
     b = ''
-    with open('instructions.txt', 'r') as f:
+    with open(file_path, 'r') as f:
         for line in f.readlines():
             b += line + '\n'
     return b

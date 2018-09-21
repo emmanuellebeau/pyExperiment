@@ -14,7 +14,7 @@ TODO:
 """
 
 # load images
-images = RU.load_images()
+images = RU.load_AB_images()
 info_txt = RU.loadInfoTxt()
 n_images = len(images)
 # define trial settings
@@ -35,14 +35,15 @@ the first key corresponds to the first alternative in the menu
 here z corresponds to the left object, and m to the right in the menu
 """
 keys = ['z', 'm']
-# initiate
-ab = AB(name='AB', distance_to_screen=100)
+
+# initiate AB class
+ab = AB(distance_to_screen=200, name='AB')
 
 # generate trials
 trial_dict = {
             'trial sequence':None, # list of named psychopy objects to draw
             'fixation time': fix_time,
-            'imgdur': img_dur,
+            'img duration': img_dur,
             'SOA': SOA,
             'max response time': max_response_time,
             'T1': None, # T1 identifier

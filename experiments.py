@@ -131,7 +131,7 @@ class AB(Controller):
                 contains fields for the following:
                     trial_sequence (list of drawable objects)
                     fixation time (in secs)
-                    imgdur (in secs)
+                    img duration (in secs)
                     SOA (in secs)
                     T1 (int/str)
                     T2 (int/str)
@@ -139,8 +139,7 @@ class AB(Controller):
                     T2 options (list of options for the menu)
                     T1 menu (list of drawable object)
                     T2 menu (list of drawable object)
-                    T1 keys (list of keys)
-                    T2 keys (list of keys)
+                    Response keys (list of keys)
                     T1 correct respons (str)
                     T2 correct respons (str)
         Todo:
@@ -170,7 +169,7 @@ class AB(Controller):
                      f'{self.run}  - trial start - {trial_start.getTime()}'\
                      f' - run start - {self.run_start.getTime()} - '\
                      f'run start - {self.run_start.getTime()}')
-            core.wait(tp['imgdur'])
+            core.wait(tp['img duration'])
             self.win.flip()
             core.wait(tp['SOA'])
 
