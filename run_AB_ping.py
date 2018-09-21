@@ -46,7 +46,7 @@ ab = AB(name='AB_ping', distance_to_screen=100)
 trial_dict = {
             'trial sequence':None, # list of named psychopy objects to draw
             'fixation time': fix_time,
-            'imgdur': img_dur,
+            'img duration': img_dur,
             'SOA': SOA,
             'max response time': max_response_time,
             'T1': None, # T1 identifier
@@ -74,6 +74,7 @@ for block in range(n_blocks):
     # Get masks
     masks = createRadialMasks(ab.win, n_masks)
     for i in range(n_trials):
+        progressBar(ab.win, i, n_trials, f'Loading stimuli for block {block+1}')
         T1 = rchoice((45, -45), 1)[0]
         T2 = rchoice((45, -45), 1)[0]
         trial_sequence = createTrialSequence(ab.win, T1, T2, t1_pos, t2_pos,

@@ -35,10 +35,6 @@ here z corresponds to the left object, and m to the right in the menu
 """
 keys = ['z', 'm']
 
-# initiate AB class
-ab = AB(distance_to_screen=200, name='AB')
-
-# generate trials
 trial_dict = {
             'trial sequence':None, # list of named psychopy objects to draw
             'fixation time': fix_time,
@@ -56,6 +52,8 @@ trial_dict = {
             'T2 correct response': None  # correct key response for T2
             }
 
+# initiate AB class
+ab = AB(distance_to_screen=200, name='AB')
 for block in range(n_blocks):
     if block == 0:
         # if the first block, show instructions
@@ -64,6 +62,7 @@ for block in range(n_blocks):
         params = {'obj_list': [info_message], 'responses': ['space']}
         ab.drawAndWait(**params)
 
+    # preload trials
     masks = RU.createImageMasks(images, n_masks)
     for i in range(n_trials):
         progressBar(ab.win, i, n_trials,

@@ -1,4 +1,4 @@
-from psychopy import gui, visual, event, core
+from psychopy import gui, core
 import sys, logging, os
 
 

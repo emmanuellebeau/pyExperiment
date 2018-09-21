@@ -8,6 +8,7 @@ logging.console.setLevel(logging.CRITICAL)
 A selection of experiment classes
 """
 def shutdown(class_obj):
+    print('Aborted by user!')
     class_obj.win.close()
     core.quit()
 
@@ -130,8 +131,8 @@ class AB(Controller):
     def formattedLog(self, msg):
         self.log(f'{msg} - trial - {self.trial} - '\
                  f'{self.trial_start.getTime()} - block - {self.block} - '\
-                 f'{self.block_start.getTime()} - run - {self.run} -'\
-                 f' {self.run_start.getTime()}')
+                 f'{self.block_start.getTime()} - run - {self.run} - '\
+                 f'{self.run_start.getTime()}')
 
     def runTrial(self, tp):
         """

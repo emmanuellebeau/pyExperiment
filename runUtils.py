@@ -1,4 +1,4 @@
-from psychopy.visual import ImageStim #import some libraries from PsychoPy
+from psychopy.visual import ImageStim, RadialStim, GratingStim
 from psychopy import visual, event, core
 import matplotlib.pyplot as plt
 import os
