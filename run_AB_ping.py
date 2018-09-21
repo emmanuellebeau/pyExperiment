@@ -18,6 +18,9 @@ def loadInfoTxt():
             b += line + '\n'
     return b
 
+def getCorrectResponse(opt, t, keys):
+    return keys[list(opt).index(t)]
+
 def createMasks(win, n_masks):
     """
     Takes a list of images and makes masks
@@ -31,11 +34,10 @@ def createMasks(win, n_masks):
 
 def createTrialSequence(win, T1, T2, t1_pos, t2_pos, masks, n_masks, RSVP_len):
     # Create trial_sequence
-    bgcolor = [0.5, 0.5, 0.5]
     trial_sequence = [rchoice(range(n_masks)) for x in range(RSVP_len)]
     trial_sequence = [masks[x]for x in trial_sequence]
-    # convert to ImageStims
-    # pick a random T1 and T2
+
+    # Add T1 and T2 to their respective positions in the stream
     trial_sequence[t1_pos] = GratingStim(win,  mask='gauss', pos=(0, 0),
                              name=f'T1 {T1}', size=6, ori=T1, sf=3)
     trial_sequence[t2_pos] = GratingStim(win,  mask='gauss', pos=(0, 0),
@@ -55,7 +57,7 @@ n_masks = 20
 im_size = 5 # in degrees
 n_blocks = 2
 max_response_time = 2.5
-
+keys  = ['z', 'm']
 # initiate
 ab = AB(name='AB_ping', distance_to_screen=100)
 
@@ -72,7 +74,7 @@ trial_dict = {
             'T2 options': None, # list of keys
             'T1 menu': None, # list of drawable objects shown as alternatives
             'T2 menu': None, # list of drawable objects shown as alternatives
-            'T1 keys': None, # possible key responses
+            'Response keys': keys, # possible key responses
             'T2 keys': None, # possible key responses
             'T1 correct response': None, # correct key response for T1
             'T2 correct response': None  # correct key response for T2
@@ -101,16 +103,17 @@ for block in range(n_blocks):
         np.random.shuffle(T2_opt)
 
         # create image instances for menu
-        pos = ([-4, 0], [4, 0])
         menu_txt = visual.TextStim(ab.win, text='Which one was the first target', pos=(0, 4), height=0.5)
         menu_txt2 = visual.TextStim(ab.win, text='Which one was the second target', pos=(0, 4), height=0.5)
-
+        pos = ([-4, 0], [4, 0])
         T1_menu = [GratingStim(ab.win,  mask='gauss', pos=pos[i],
                                  name=f'Menu {x}', size=6, ori=x, sf=3) for i, x in enumerate(T1_opt)]
         T1_menu.append(menu_txt)
         T2_menu = [GratingStim(ab.win,  mask='gauss', pos=pos[i],
                                  name=f'Menu {x}', size=6, ori=x, sf=3) for i, x in enumerate(T2_opt)]
         T2_menu.append(menu_txt2)
+
+
         # Add specifics to trial_dict
         trial_dict['trial sequence'] = trial_sequence
         trial_dict['trial type'] = 'ping'
@@ -120,17 +123,9 @@ for block in range(n_blocks):
         trial_dict['T2 options'] = T2_opt
         trial_dict['T1 menu'] = T1_menu
         trial_dict['T2 menu'] = T2_menu
-        trial_dict['T1 keys'] = ['z', 'm']
-        trial_dict['T2 keys'] = ['z', 'm']
-        if T1_opt[0] == T1:
-            trial_dict['T1 correct response'] = 'z'
-        else:
-            trial_dict['T1 correct response'] = 'm'
+        trial_dict['T1 correct response'] = getCorrectResponse(T1_opt, T1, keys)
+        trial_dict['T2 correct response'] = getCorrectResponse(T2_opt, T2, keys)
 
-        if T2_opt[0] == T2:
-            trial_dict['T2 correct response'] = 'z'
-        else:
-            trial_dict['T2 correct response'] = 'm'
         ab.addTrial(trial_dict.copy())
 
     if block == n_blocks-1: # if last block

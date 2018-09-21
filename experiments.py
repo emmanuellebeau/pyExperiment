@@ -185,7 +185,7 @@ class AB(Controller):
                  f'{self.run} - {self.run_start.getTime()} - '\
                  f'{trial_start.getTime()}')
         self.t1_response = self.drawAndWait(tp['T1 menu'],
-                                            responses=tp['T1 keys'],
+                                            responses=tp['Response keys'],
                                             max_time=tp['max response time'])
         self.t1_rt = timer.getTime()
 
@@ -194,7 +194,7 @@ class AB(Controller):
                  f'{self.run} - {self.run_start.getTime()} - '\
                  f'{trial_start.getTime()}')
         self.t2_response = self.drawAndWait(tp['T2 menu'],
-                                            responses=tp['T2 keys'],
+                                            responses=tp['Response keys'],
                                             max_time=tp['max response time'])
         self.t2_rt = timer.getTime()
 
