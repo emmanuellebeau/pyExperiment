@@ -55,25 +55,22 @@ def getSubjectInfo(experiment_name='my name', n_sessions=2, n_runs=2):
 
 
 class Controller(EEGLogging, PupilLogging):
+    """
+    Parent class for any type of experiment. Your experiment class needs a
+    runTrial-method that will be called from this parent class.
+
+    Automatic initialization of logging events
+    and fetching subject information.
+
+    Parameters:
+        name: str
+            name of the experiment
+        n_sessions: int
+        n_runs: int
+    Todo:
+        * TODO - a lot
+    """
     def __init__(self, name='my_experiment', n_sessions=2, n_runs=8):
-        """
-        Parent class for any type of experiment. Your experiment class needs a
-        runTrial-method that will be called from this parent class. Your
-        experimental class also need a trials attribute, which is a list
-        of dictionaries containing the specific trial parameters that will
-        be sent to the runTrial method.
-
-        Automatic initialization of logging events
-        and fetching subject information.
-
-        Parameters:
-            name: str
-                name of the experiment
-            n_sessions: int
-            n_runs: int
-        Todo:
-            * TODO - a lot
-        """
         self.experiment_name = name
         self.n_sessions = n_sessions
         self.n_runs = n_runs
@@ -89,11 +86,10 @@ class Controller(EEGLogging, PupilLogging):
         self.win = False
         self.run_start = core.Clock()
 
-        start_str = f'Starting {self.experiment_name} for subject '\
-                    f'{self.subject_id} age {self.age} session '\
-                    f'{self.session} run {self.run}'
+        start_str = f'Starting {self.experiment_name} - subject - '\
+                    f'{self.subject_id} - age - {self.age} - run - '\
+                    f'{self.run} - session - {self.session}'
         self.log(start_str)
-
 
 
     def _initLogger(self):

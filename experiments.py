@@ -21,7 +21,6 @@ def get_keypress(class_obj):
     else:
         return False
 
-
 def progressBar(win, i, n, load_txt='Loading'):
     """
     Progress bar
@@ -49,13 +48,9 @@ class bareBoneExperiment(Controller):
     """
     def __init__(self, **args):
         super().__init__(**args)
-        self.trials = []
 
     def runTrials():
         pass
-
-    def clearTrials(self):
-        self.trials = []
 
 
 class AB(Controller):
@@ -105,7 +100,7 @@ class AB(Controller):
         with open(self.trial_log_name, 'a') as f:
             f.write('\t'.join(trial_info) + '\n')
 
-    def drawAndWait(self, obj_list, responses=[], max_time=False):
+    def drawAndWait(self, obj_list, responses=[], max_time=False, pos=False):
         """
         parameters
             obj: list of psychopy object with draw method
@@ -124,7 +119,9 @@ class AB(Controller):
             if key and key in responses:
                 return key
             event.clearEvents()
-            for obj in obj_list:
+            for i, obj in enumerate(obj_list):
+                if pos:
+                    obj.setPos(pos[i])
                 obj.draw()
             self.win.flip()
 
@@ -149,6 +146,7 @@ class AB(Controller):
                     T2 options (list of options for the menu)
                     T1 menu (list of drawable object)
                     T2 menu (list of drawable object)
+                    Menu pos (list of position to draw every object in the menu lists)
                     Response keys (list of keys)
                     T1 correct respons (str)
                     T2 correct respons (str)
@@ -172,6 +170,7 @@ class AB(Controller):
         self.formattedLog('Start of RSVP')
         for i, im in enumerate(tp['trial sequence']):
             get_keypress(self)
+            im.setPos((0, 0))
             im.draw()
             self.win.flip()
             self.formattedLog(f'RSVP {im.name}')
@@ -179,27 +178,30 @@ class AB(Controller):
             self.win.flip()
             core.wait(tp['SOA'])
 
-        # fixation before menu
         self.formattedLog('End of RSVP')
 
+        # fixation before menu
         fixation.draw()
         self.win.flip()
         core.wait(0.5)
 
-        # draw menu
+        # draw menu for T1
         timer = core.Clock()
         self.formattedLog('T1 menu')
         self.t1_response = self.drawAndWait(tp['T1 menu'],
                                             responses=tp['Response keys'],
-                                            max_time=tp['max response time'])
+                                            max_time=tp['max response time'],
+                                            pos=tp['Menu pos'])
         self.t1_rt = timer.getTime()
         self.formattedLog(f'T1 response {self.t1_response}')
 
+        # draw menu for T2
         timer = core.Clock()
         self.formattedLog('T2 menu')
         self.t2_response = self.drawAndWait(tp['T2 menu'],
                                             responses=tp['Response keys'],
-                                            max_time=tp['max response time'])
+                                            max_time=tp['max response time'],
+                                            pos=tp['Menu pos'])
         self.t2_rt = timer.getTime()
         self.formattedLog(f'T2 response {self.t2_response}')
 

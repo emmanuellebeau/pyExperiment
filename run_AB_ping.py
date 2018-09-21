@@ -55,6 +55,9 @@ trial_dict = {
             'T2 options': None, # list of keys
             'T1 menu': None, # list of drawable objects shown as alternatives
             'T2 menu': None, # list of drawable objects shown as alternatives
+            # at what position to draw the menu
+            # first two are images, last position is for the text
+            'Menu pos': ([-4, 0], [4, 0], [0, 4]),
             'Response keys': keys, # possible key responses
             'T2 keys': None, # possible key responses
             'T1 correct response': None, # correct key response for T1
@@ -89,19 +92,16 @@ for block in range(n_blocks):
 
         # create image instances for menu
         menu_txt = visual.TextStim(ab.win,
-                text='Which one was the first target', pos=(0, 4), height=0.5)
+                text='Which one was the first target', height=0.5)
         menu_txt2 = visual.TextStim(ab.win,
-                text='Which one was the second target', pos=(0, 4), height=0.5)
-        pos = ([-4, 0], [4, 0])
-        T1_menu = [GratingStim(ab.win,  mask='gauss', pos=pos[i],
-                                 name=f'Menu {x}', size=6, ori=x, sf=3)
-                                 for i, x in enumerate(T1_opt)]
-        T1_menu.append(menu_txt)
-        T2_menu = [GratingStim(ab.win,  mask='gauss', pos=pos[i],
-                                 name=f'Menu {x}', size=6, ori=x, sf=3)
-                                 for i, x in enumerate(T2_opt)]
-        T2_menu.append(menu_txt2)
+                text='Which one was the second target', height=0.5)
 
+        T1_menu = [GratingStim(ab.win,  mask='gauss', name=f'Menu {x}',
+                   size=6, ori=x, sf=3) for x in T1_opt]
+        T1_menu.append(menu_txt)
+        T2_menu = [GratingStim(ab.win,  mask='gauss', name=f'Menu {x}',
+                   size=6, ori=x, sf=3) for x in T2_opt]
+        T2_menu.append(menu_txt2)
 
         # Add specifics to trial_dict
         trial_dict['trial sequence'] = trial_sequence

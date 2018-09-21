@@ -12,10 +12,6 @@ TODO:
     fix dialogue box for getting responses
 """
 
-# load images
-images = RU.load_AB_images()
-info_txt = RU.loadInfoTxt()
-n_images = len(images)
 # define trial settings
 fix_time = 0.5
 img_dur = 0.02
@@ -47,6 +43,9 @@ trial_dict = {
             'T2 options': None, # list of keys
             'T1 menu': None, # list of drawable objects shown as alternatives
             'T2 menu': None, # list of drawable objects shown as alternatives
+            # at what position to draw the menu
+            # first two are images, last position is for the text
+            'Menu pos': ([-4, 0], [4, 0], [0, 4]),
             'Response keys': keys, # possible key responses
             'T1 correct response': None, # correct key response for T1
             'T2 correct response': None  # correct key response for T2
@@ -54,6 +53,29 @@ trial_dict = {
 
 # initiate AB class
 ab = AB(distance_to_screen=200, name='AB')
+
+"""
+Preload images and the masks turn them into textures
+"""
+info_txt = RU.loadInfoTxt()
+# Load images
+images = RU.load_AB_images()
+n_images = len(images)
+img_textures = []
+for i in range(n_images):
+    progressBar(ab.win, i, n_images,
+                load_txt=f'Loading images')
+    img_textures.append(ImageStim(ab.win, images[i], name=f'{i}',
+                                  size=im_size,  flipVert=True))
+# load masks
+masks = RU.createImageMasks(images, n_masks)
+mask_textures = []
+for i in range(n_masks):
+    progressBar(ab.win, i, n_masks,
+                load_txt=f'Loading masks')
+    mask_textures.append(ImageStim(ab.win, masks[i], name=f'mask',
+                                  size=im_size,  flipVert=True))
+# Start looping over blocks
 for block in range(n_blocks):
     if block == 0:
         # if the first block, show instructions
@@ -62,40 +84,43 @@ for block in range(n_blocks):
         params = {'obj_list': [info_message], 'responses': ['space']}
         ab.drawAndWait(**params)
 
-    # preload trials
-    masks = RU.createImageMasks(images, n_masks)
+    # Create all the trials for the block
     for i in range(n_trials):
-        progressBar(ab.win, i, n_trials,
-                    load_txt=f'Loading trials for block {block+1}')
+
         # Pick targets and create RSVP sequence
         T1 = rchoice(range(n_images), 1)[0]
         T2 = rchoice(range(n_images), 1)[0]
-        trial_sequence = RU.createRSVP(ab.win, T1, T2, t1_pos, t2_pos, images,
-                                       masks, RSVP_len, im_size)
+        # Randomly pick RSVP_len number of masks
+        trial_sequence = [mask_textures[np.random.randint(n_masks)]
+                                        for x in range(RSVP_len)]
+
+        # Replace the T1 and T2 positions with the targets
+        trial_sequence[t1_pos] = img_textures[T1]
+        trial_sequence[t2_pos] = img_textures[T2]
+
         # Make menu options
         possible_menu_options = np.setdiff1d(range(n_images), [T1, T2])
+
         T1_opt = np.append(rchoice(possible_menu_options, 1), T1)
         np.random.shuffle(T1_opt)
 
         T2_opt = np.append(rchoice(possible_menu_options, 1), T2)
         np.random.shuffle(T2_opt)
 
-        # create image instances for menu
-        pos = ([-4, 0], [4, 0])
+        # create text instances for menu
         menu_txt = visual.TextStim(ab.win,
                 text='Which one was the first target', pos=(0, 4), height=0.5)
         menu_txt2 = visual.TextStim(ab.win,
                 text='Which one was the second target', pos=(0, 4), height=0.5)
-        T1_menu = [ImageStim(ab.win, images[x], name=f'T1 menu {x}',
-                             size=im_size, pos=pos[i],  flipVert=True)
-                             for i, x in enumerate(T1_opt)]
-        T1_menu.append(menu_txt)
-        T2_menu = [ImageStim(ab.win, images[x], name=f'T2 menu {x}',
-                             size=im_size, pos=pos[i],  flipVert=True)
-                             for i, x in enumerate(T2_opt)]
-        T2_menu.append(menu_txt2)
-        # Add specifics to trial_dict
 
+        T1_menu = [img_textures[x] for i, x in enumerate(T1_opt)]
+        T1_menu.append(menu_txt)
+        print(T1_menu)
+
+        T2_menu = [img_textures[x] for i, x in enumerate(T2_opt)]
+        T2_menu.append(menu_txt2)
+
+        # Add specifics to trial_dict
         trial_dict['trial sequence'] = trial_sequence
         trial_dict['trial type'] = 'lag 2'
         trial_dict['T1'] = T1

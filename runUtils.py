@@ -12,11 +12,13 @@ TODO:
     fix dialogue box for getting responses
 """
 
-def load_AB_images():
-    STIM_FOLDER = 'stim/'
+def load_AB_images(stim_folder='stim/'):
+    """
+    images should be numbered and named: image_xx.jpg
+    """
     images = []
     for im in range(1, 41):
-        path = os.path.join(STIM_FOLDER, f'image_{im:02d}.jpg')
+        path = os.path.join(stim_folder, f'image_{im:02d}.jpg')
         img = plt.imread(path).astype(float)
         # if image is not scaled between 0-1
         if img.max() > 1:
@@ -36,7 +38,14 @@ def loadInfoTxt(file_path='instructions.txt'):
 
 def createImageMasks(images, n_masks, size=10):
     """
-    Takes a list of images and makes masks
+    Takes a list of images and makes masks by dividing a mask into squares
+    and randomly sample from the pool of images
+    Parameters:
+        images: list of np.array images
+        n_masks: int
+            number of masks
+        size: int
+            size of square
     """
     n_images = len(images)
     img_size = images[0].shape
