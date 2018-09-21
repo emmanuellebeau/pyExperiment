@@ -1,39 +1,20 @@
-from psychopy.visual import RadialStim, GratingStim #import some libraries from PsychoPy
+from psychopy.visual import RadialStim, GratingStim
 from psychopy import visual, event, core
-import matplotlib.pyplot as plt
 import os
 import numpy as np
 from experiments import *
 from numpy.random import choice as rchoice
+from runUtils import loadInfoTxt, getCorrectResponse, createRadialMasks
 
 """
 TODO:
     fix monitor
     fix dialogue box for getting responses
 """
-def loadInfoTxt():
-    b = ''
-    with open('instructions.txt', 'r') as f:
-        for line in f.readlines():
-            b += line + '\n'
-    return b
 
-def getCorrectResponse(opt, t, keys):
-    return keys[list(opt).index(t)]
-
-def createMasks(win, n_masks):
-    """
-    Takes a list of images and makes masks
-    """
-    masks = []
-    for i in range(n_masks):
-        mask = RadialStim(win, mask='gauss', size=6, radialCycles=5,
-                         angularCycles=5, ori=np.random.randint(360), name='mask')
-        masks.append(mask)
-    return masks
-
-def createTrialSequence(win, T1, T2, t1_pos, t2_pos, masks, n_masks, RSVP_len):
+def createTrialSequence(win, T1, T2, t1_pos, t2_pos, masks, RSVP_len):
     # Create trial_sequence
+    n_masks = len(masks)
     trial_sequence = [rchoice(range(n_masks)) for x in range(RSVP_len)]
     trial_sequence = [masks[x]for x in trial_sequence]
 
@@ -86,14 +67,17 @@ ping = RadialStim(ab.win, mask='circle', size=6, radialCycles=0,
 for block in range(n_blocks):
     if block == 0:
         # if the first block, show instructions
-        info_message = visual.TextStim(ab.win, text=info_txt, pos=(0, 0), height=0.5)
+        info_message = visual.TextStim(ab.win, text=info_txt,
+                                       pos=(0, 0), height=0.5)
         params = {'obj_list': [info_message], 'responses': ['space']}
         ab.drawAndWait(**params)
-    masks = createMasks(ab.win, n_masks)
+    # Get masks
+    masks = createRadialMasks(ab.win, n_masks)
     for i in range(n_trials):
         T1 = rchoice((45, -45), 1)[0]
         T2 = rchoice((45, -45), 1)[0]
-        trial_sequence = createTrialSequence(ab.win, T1, T2, t1_pos, t2_pos, masks, n_masks, RSVP_len)
+        trial_sequence = createTrialSequence(ab.win, T1, T2, t1_pos, t2_pos,
+                                             masks, RSVP_len)
         addage = [empty, empty, empty, ping]
         trial_sequence.extend(addage)
         # Make menu options
@@ -103,14 +87,18 @@ for block in range(n_blocks):
         np.random.shuffle(T2_opt)
 
         # create image instances for menu
-        menu_txt = visual.TextStim(ab.win, text='Which one was the first target', pos=(0, 4), height=0.5)
-        menu_txt2 = visual.TextStim(ab.win, text='Which one was the second target', pos=(0, 4), height=0.5)
+        menu_txt = visual.TextStim(ab.win,
+                text='Which one was the first target', pos=(0, 4), height=0.5)
+        menu_txt2 = visual.TextStim(ab.win,
+                text='Which one was the second target', pos=(0, 4), height=0.5)
         pos = ([-4, 0], [4, 0])
         T1_menu = [GratingStim(ab.win,  mask='gauss', pos=pos[i],
-                                 name=f'Menu {x}', size=6, ori=x, sf=3) for i, x in enumerate(T1_opt)]
+                                 name=f'Menu {x}', size=6, ori=x, sf=3)
+                                 for i, x in enumerate(T1_opt)]
         T1_menu.append(menu_txt)
         T2_menu = [GratingStim(ab.win,  mask='gauss', pos=pos[i],
-                                 name=f'Menu {x}', size=6, ori=x, sf=3) for i, x in enumerate(T2_opt)]
+                                 name=f'Menu {x}', size=6, ori=x, sf=3)
+                                 for i, x in enumerate(T2_opt)]
         T2_menu.append(menu_txt2)
 
 
@@ -130,9 +118,12 @@ for block in range(n_blocks):
 
     if block == n_blocks-1: # if last block
         block_txt = f'End of run {ab.run}\npress space to continue'
-        info_message = visual.TextStim(ab.win, text=block_txt, pos=(0, 0), height=0.5)
+        info_message = visual.TextStim(ab.win, text=block_txt,
+                                       pos=(0, 0), height=0.5)
     else:
-        block_txt = f'End of block {block+1}/{n_blocks}\nPress space to continue'
-        info_message = visual.TextStim(ab.win, text=block_txt, pos=(0, 0), height=0.5)
+        block_txt = f'End of block {block+1}/{n_blocks}\n'\
+                    f'Press space to continue'
+        info_message = visual.TextStim(ab.win, text=block_txt,
+                                       pos=(0, 0), height=0.5)
     params = {'obj_list': [info_message], 'responses': ['space']}
     ab.start(run_after=[(ab.drawAndWait, params)])

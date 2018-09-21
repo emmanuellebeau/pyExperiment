@@ -41,8 +41,10 @@ def createImageMasks(images, n_masks, size=10):
     n_images = len(images)
     img_size = images[0].shape
 
-    assert img_size[0] == img_size[1], 'Images need to be square'
-    assert (img_size[0]/size).is_integer(), f'{img_size[0]} not dividable with {size}'
+    if not img_size[0] == img_size[1]:
+        raise ValueError('Images need to be square')
+    if not (img_size[0]/size).is_integer():
+        raise ValueError(f'{img_size[0]} not dividable with {size}')
 
     n_boxes = int(img_size[0]/size)
 
@@ -62,10 +64,23 @@ def createImageMasks(images, n_masks, size=10):
         masks.append(mask)
     return masks
 
+def createRadialMasks(win, n_masks):
+    """
+    Creates radial masks with random orientation
+    """
+    masks = []
+    for i in range(n_masks):
+        mask = RadialStim(win, mask='gauss', size=6, radialCycles=5,
+                         angularCycles=5, ori=np.random.randint(360),
+                         name='mask')
+        masks.append(mask)
+    return masks
+
 def createRSVP(win, T1, T2, t1_pos, t2_pos,
-               images, masks, n_masks, RSVP_len, im_size):
+               images, masks, RSVP_len, im_size):
     # Create trial_sequence
     bgcolor = [0.5, 0.5, 0.5]
+    n_masks = len(masks)
     trial_sequence = [rchoice(range(n_masks)) for x in range(RSVP_len)]
     trial_sequence = [ImageStim(win, masks[x], name=f'Mask {x}', color=bgcolor,
                       size=im_size, flipVert=True) for x in trial_sequence]

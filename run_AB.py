@@ -1,6 +1,5 @@
-from psychopy.visual import ImageStim #import some libraries from PsychoPy
+from psychopy.visual import ImageStim
 from psychopy import visual, event, core
-import matplotlib.pyplot as plt
 import os
 import numpy as np
 from numpy.random import choice as rchoice
@@ -73,7 +72,7 @@ for block in range(n_blocks):
         T1 = rchoice(range(n_images), 1)[0]
         T2 = rchoice(range(n_images), 1)[0]
         trial_sequence = RU.createRSVP(ab.win, T1, T2, t1_pos, t2_pos, images,
-                                       masks, n_masks, RSVP_len, im_size)
+                                       masks, RSVP_len, im_size)
         # Make menu options
         possible_menu_options = np.setdiff1d(range(n_images), [T1, T2])
         T1_opt = np.append(rchoice(possible_menu_options, 1), T1)

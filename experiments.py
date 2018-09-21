@@ -30,10 +30,12 @@ def progressBar(win, i, n, load_txt='Loading'):
     percentage_done = i/n*100
     w = percentage_done/10
     x_pos = -4.5 + w*0.5
-    progress_bar = visual.Rect(win, width=w, height=0.5, pos=(x_pos, -4), fillColor="white")
+    progress_bar = visual.Rect(win, width=w, height=0.5,
+                               pos=(x_pos, -4), fillColor="white")
     # print percentage done
     percent_text = f'{percentage_done:.2f} % done'
-    percentage = visual.TextStim(win, text=percent_text, pos=(0, -1), height=0.6)
+    percentage = visual.TextStim(win, text=percent_text,
+                                 pos=(0, -1), height=0.6)
     load_info.draw()
     progress_bar.draw()
     percentage.draw()
@@ -60,7 +62,8 @@ class AB(Controller):
     Todo:
         Write this doc string
     """
-    def __init__(self, distance_to_screen=60, monitor='testMonitor', fullscr=True, **args):
+    def __init__(self, distance_to_screen=60, monitor='testMonitor',
+                 fullscr=True, **args):
         super(AB, self).__init__(**args)
         self.win = visual.Window([1024,768], fullscr=fullscr, screen=1,
                                  monitor=monitor, units="deg")
@@ -124,6 +127,12 @@ class AB(Controller):
                 obj.draw()
             self.win.flip()
 
+    def formattedLog(self, msg):
+        self.log(f'{msg} - trial - {self.trial} - '\
+                 f'{self.trial_start.getTime()} - block - {self.block} - '\
+                 f'{self.block_start.getTime()} - run - {self.run} -'\
+                 f' {self.run_start.getTime()}')
+
     def runTrial(self, tp):
         """
         Parameters
@@ -146,12 +155,10 @@ class AB(Controller):
             Make sure timing is correct depending on refresh rate
         """
         # start trial clock
-        trial_start = core.Clock()
+        self.trial_start = core.Clock()
 
         # log trial start
-        self.log(f'Start of trial - {self.trial} - run - {self.run}  - '\
-                 f'run start - {self.run_start.getTime()} - '\
-                 f'run start - {self.run_start.getTime()}')
+        self.formattedLog('Start of trial')
 
         # show fixation
         fixation = visual.GratingStim(win=self.win, size=0.4,
@@ -161,48 +168,43 @@ class AB(Controller):
         core.wait(tp['fixation time'])
 
         # begin RSVP
+        self.formattedLog('Start of RSVP')
         for i, im in enumerate(tp['trial sequence']):
             get_keypress(self)
             im.draw()
             self.win.flip()
-            self.log(f'RSVP - {im.name} - trial - {self.trial} - run - '\
-                     f'{self.run}  - trial start - {trial_start.getTime()}'\
-                     f' - run start - {self.run_start.getTime()} - '\
-                     f'run start - {self.run_start.getTime()}')
+            self.formattedLog(f'RSVP {im.name}')
             core.wait(tp['img duration'])
             self.win.flip()
             core.wait(tp['SOA'])
 
         # fixation before menu
+        self.formattedLog('End of RSVP')
+
         fixation.draw()
         self.win.flip()
         core.wait(0.5)
 
         # draw menu
         timer = core.Clock()
-        self.log(f'T1 menu - {self.subject_id} - {self.trial} -  '\
-                 f'{self.run} - {self.run_start.getTime()} - '\
-                 f'{trial_start.getTime()}')
+        self.formattedLog('T1 menu')
         self.t1_response = self.drawAndWait(tp['T1 menu'],
                                             responses=tp['Response keys'],
                                             max_time=tp['max response time'])
         self.t1_rt = timer.getTime()
+        self.formattedLog(f'T1 response {self.t1_response}')
 
         timer = core.Clock()
-        self.log(f'T2 menu - {self.subject_id} - {self.trial} -  '\
-                 f'{self.run} - {self.run_start.getTime()} - '\
-                 f'{trial_start.getTime()}')
+        self.formattedLog('T2 menu')
         self.t2_response = self.drawAndWait(tp['T2 menu'],
                                             responses=tp['Response keys'],
                                             max_time=tp['max response time'])
         self.t2_rt = timer.getTime()
+        self.formattedLog(f'T2 response {self.t2_response}')
 
         self.t1_hit = tp['T1 correct response'] == self.t1_response
         self.t2_hit = tp['T2 correct response'] == self.t2_response
 
         # save trial data
         self.updateTrialLog(tp)
-
-        self.log(f'End of trial - {self.trial} - run - {self.run}  - '\
-                 f'run start - {self.run_start.getTime()} - '\
-                 f'run start - {self.run_start.getTime()}')
+        self.formattedLog('End of trial')
