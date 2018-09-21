@@ -59,18 +59,18 @@ def createMasks(images, n_masks, size=10):
         masks.append(mask)
     return masks
 
-def createTrialSequence(AB, T1, T2, t1_pos, t2_pos, images, masks, n_masks, RSVP_len, im_size):
+def createTrialSequence(win, T1, T2, t1_pos, t2_pos, images, masks, n_masks, RSVP_len, im_size):
     # Create trial_sequence
     bgcolor = [0.5, 0.5, 0.5]
     trial_sequence = [rchoice(range(n_masks)) for x in range(RSVP_len)]
-    trial_sequence = [ImageStim(AB.win, masks[x], name=f'Mask {x}', color=bgcolor,
+    trial_sequence = [ImageStim(win, masks[x], name=f'Mask {x}', color=bgcolor,
                       size=im_size, flipVert=True) for x in trial_sequence]
     # convert to ImageStims
     # pick a random T1 and T2
 
-    trial_sequence[t1_pos] = ImageStim(AB.win, images[T1], name=f'T1 {T1}', color=bgcolor,
+    trial_sequence[t1_pos] = ImageStim(win, images[T1], name=f'T1 {T1}', color=bgcolor,
                                        size=im_size,  flipVert=True)
-    trial_sequence[t2_pos] = ImageStim(AB.win, images[T2], name=f'T2 {T2}', color=bgcolor,
+    trial_sequence[t2_pos] = ImageStim(win, images[T2], name=f'T2 {T2}', color=bgcolor,
                                        size=im_size,  flipVert=True)
     return trial_sequence
 
@@ -78,7 +78,11 @@ def createTrialSequence(AB, T1, T2, t1_pos, t2_pos, images, masks, n_masks, RSVP
 images = load_images()
 info_txt = loadInfoTxt()
 n_images = len(images)
-n_trials = 50
+# define trial settings
+fix_time = 0.5
+img_dur = 0.02
+SOA = 0.1
+n_trials = 10
 t1_pos = 5
 t2_pos = 7
 RSVP_len = 12
@@ -87,45 +91,41 @@ im_size = 5 # in degrees
 n_blocks = 2
 max_response_time = 2.5
 
-AB = AB(name='AB')
-AB.initTrialLog()
-print('initated AB')
-win = visual.Window([800,600], fullscr=True, screen=1, monitor="testMonitor", units="deg")
-AB.win = win
+# initiate
+ab = AB(name='AB', distance_to_screen=100)
+
 # generate trials
-
-
 trial_dict = {
             'trial sequence':None, # list of named psychopy objects to draw
-            'fixation time': 0.5,
-            'imgdur': 0.02,
-            'SOA': 0.1,
+            'fixation time': fix_time,
+            'imgdur': img_dur,
+            'SOA': SOA,
             'max response time': max_response_time,
-            'T1': None,
-            'T2': None,
-            'T1 options': None,
-            'T2 options': None,
-            'T1 menu': None,
-            'T2 menu': None,
-            'T1 responses': None, # possible key responses
-            'T2 responses': None, # possible key responses
-            'T1 correct response': None,
-            'T2 correct response': None
+            'T1': None, # T1 identifier
+            'T2': None, # T2 identifier
+            'T1 options': None, # list of keys
+            'T2 options': None, # list of keys
+            'T1 menu': None, # list of drawable objects shown as alternatives
+            'T2 menu': None, # list of drawable objects shown as alternatives
+            'T1 keys': None, # possible key responses
+            'T2 keys': None, # possible key responses
+            'T1 correct response': None, # correct key response for T1
+            'T2 correct response': None  # correct key response for T2
             }
 
 for block in range(n_blocks):
     if block == 0:
         # if the first block, show instructions
-        info_message = visual.TextStim(win, text=info_txt, pos=(0, 0), height=0.5)
+        info_message = visual.TextStim(ab.win, text=info_txt, pos=(0, 0), height=0.5)
         params = {'obj_list': [info_message], 'responses': ['space']}
-        AB.drawAndWait(**params)
+        ab.drawAndWait(**params)
 
     masks = createMasks(images, n_masks)
     for i in range(n_trials):
-        progressBar(AB, i, n_trials, load_txt=f'Loading trials for block {block+1}')
+        progressBar(ab.win, i, n_trials, load_txt=f'Loading trials for block {block+1}')
         T1 = rchoice(range(n_images), 1)[0]
         T2 = rchoice(range(n_images), 1)[0]
-        trial_sequence = createTrialSequence(AB, T1, T2, t1_pos, t2_pos, images,
+        trial_sequence = createTrialSequence(ab.win, T1, T2, t1_pos, t2_pos, images,
                                              masks, n_masks, RSVP_len, im_size)
         # Make menu options
         possible_menu_options = np.setdiff1d(range(n_images), [T1, T2])
@@ -137,12 +137,12 @@ for block in range(n_blocks):
 
         # create image instances for menu
         pos = ([-4, 0], [4, 0])
-        menu_txt = visual.TextStim(win, text='Which one was the first target', pos=(0, 4), height=0.5)
-        menu_txt2 = visual.TextStim(win, text='Which one was the second target', pos=(0, 4), height=0.5)
-        T1_menu = [ImageStim(AB.win, images[x], name=f'T1 menu {x}',
+        menu_txt = visual.TextStim(ab.win, text='Which one was the first target', pos=(0, 4), height=0.5)
+        menu_txt2 = visual.TextStim(ab.win, text='Which one was the second target', pos=(0, 4), height=0.5)
+        T1_menu = [ImageStim(ab.win, images[x], name=f'T1 menu {x}',
                              size=im_size, pos=pos[i],  flipVert=True) for i, x in enumerate(T1_opt)]
         T1_menu.append(menu_txt)
-        T2_menu = [ImageStim(AB.win, images[x], name=f'T2 menu {x}',
+        T2_menu = [ImageStim(ab.win, images[x], name=f'T2 menu {x}',
                              size=im_size, pos=pos[i],  flipVert=True) for i, x in enumerate(T2_opt)]
         T2_menu.append(menu_txt2)
         # Add specifics to trial_dict
@@ -154,8 +154,8 @@ for block in range(n_blocks):
         trial_dict['T2 options'] = T2_opt
         trial_dict['T1 menu'] = T1_menu
         trial_dict['T2 menu'] = T2_menu
-        trial_dict['T1 responses'] = ['z', 'm']
-        trial_dict['T2 responses'] = ['z', 'm']
+        trial_dict['T1 keys'] = ['z', 'm']
+        trial_dict['T2 keys'] = ['z', 'm']
         if T1_opt[0] == T1:
             trial_dict['T1 correct response'] = 'z'
         else:
@@ -165,13 +165,13 @@ for block in range(n_blocks):
             trial_dict['T2 correct response'] = 'z'
         else:
             trial_dict['T2 correct response'] = 'm'
-        AB.addTrial(trial_dict.copy())
+        ab.addTrial(trial_dict.copy())
 
-    if block == n_blocks-1:
-        block_txt = f'End of run {AB.run}\npress space to continue'
-        info_message = visual.TextStim(win, text=block_txt, pos=(0, 0), height=0.5)
+    if block == n_blocks-1: # if last block
+        block_txt = f'End of run {ab.run}\npress space to continue'
+        info_message = visual.TextStim(ab.win, text=block_txt, pos=(0, 0), height=0.5)
     else:
         block_txt = f'End of block {block+1}/{n_blocks}\nPress space to continue'
-        info_message = visual.TextStim(win, text=block_txt, pos=(0, 0), height=0.5)
+        info_message = visual.TextStim(ab.win, text=block_txt, pos=(0, 0), height=0.5)
     params = {'obj_list': [info_message], 'responses': ['space']}
-    AB.start(run_after=[(AB.drawAndWait, params)])
+    ab.start(run_after=[(ab.drawAndWait, params)])

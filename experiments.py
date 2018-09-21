@@ -21,23 +21,23 @@ def get_keypress(class_obj):
         return False
 
 
-def progressBar(class_obj, i, n, load_txt='Loading'):
+def progressBar(win, i, n, load_txt='Loading'):
     """
     Progress bar
     """
-    load_info = visual.TextStim(class_obj.win, text=load_txt, pos=(0, 1), height=0.6)
+    load_info = visual.TextStim(win, text=load_txt, pos=(0, 1), height=0.6)
     # make progress bar
     percentage_done = i/n*100
     w = percentage_done/10
     x_pos = -4.5 + w*0.5
-    progress_bar = visual.Rect(class_obj.win, width=w, height=0.5, pos=(x_pos, -4), fillColor="white")
+    progress_bar = visual.Rect(win, width=w, height=0.5, pos=(x_pos, -4), fillColor="white")
     # print percentage done
     percent_text = f'{percentage_done:.2f} % done'
-    percentage = visual.TextStim(class_obj.win, text=percent_text, pos=(0, -1), height=0.6)
+    percentage = visual.TextStim(win, text=percent_text, pos=(0, -1), height=0.6)
     load_info.draw()
     progress_bar.draw()
     percentage.draw()
-    class_obj.win.flip()
+    win.flip()
 
 class bareBoneExperiment(Controller):
     """
@@ -60,10 +60,14 @@ class AB(Controller):
     Todo:
         Write this doc string
     """
-    def __init_(self, **args):
-        Controller().__init__(self, **args)
+    def __init__(self, distance_to_screen=60, monitor='testMonitor', fullscr=True, **args):
+        super(AB, self).__init__(**args)
+        self.win = visual.Window([1024,768], fullscr=fullscr, screen=1,
+                                 monitor=monitor, units="deg")
+        self.win.mouseVisible = False
+        self._initTrialLog()
 
-    def initTrialLog(self):
+    def _initTrialLog(self):
         """
         A more specific log for only saving necessary
         trial by trial information
@@ -92,7 +96,7 @@ class AB(Controller):
                       self.run, self.trial, tp['T1'], tp['T2'],
                       tp['T1 options'], tp['T2 options'], self.t1_response,
                       self.t2_response, self.t1_rt, self.t2_rt,
-                      tp['t1_hit'], tp['t2_hit']]
+                      self.t1_hit, self.t2_hit]
         trial_info = [str(x) for x in trial_info]
         with open(self.trial_log_name, 'a') as f:
             f.write('\t'.join(trial_info) + '\n')
@@ -135,8 +139,8 @@ class AB(Controller):
                     T2 options (list of options for the menu)
                     T1 menu (list of drawable object)
                     T2 menu (list of drawable object)
-                    T1 responses (list of keys)
-                    T2 responses (list of keys)
+                    T1 keys (list of keys)
+                    T2 keys (list of keys)
                     T1 correct respons (str)
                     T2 correct respons (str)
         Todo:
@@ -151,7 +155,8 @@ class AB(Controller):
                  f'run start - {self.run_start.getTime()}')
 
         # show fixation
-        fixation = visual.GratingStim(win=self.win, size=0.4, pos=[0,0], sf=0, rgb=-1)
+        fixation = visual.GratingStim(win=self.win, size=0.4,
+                                      pos=[0,0], sf=0, rgb=-1)
         fixation.draw()
         self.win.flip()
         core.wait(tp['fixation time'])
@@ -180,7 +185,7 @@ class AB(Controller):
                  f'{self.run} - {self.run_start.getTime()} - '\
                  f'{trial_start.getTime()}')
         self.t1_response = self.drawAndWait(tp['T1 menu'],
-                                            responses=tp['T1 responses'],
+                                            responses=tp['T1 keys'],
                                             max_time=tp['max response time'])
         self.t1_rt = timer.getTime()
 
@@ -189,12 +194,12 @@ class AB(Controller):
                  f'{self.run} - {self.run_start.getTime()} - '\
                  f'{trial_start.getTime()}')
         self.t2_response = self.drawAndWait(tp['T2 menu'],
-                                            responses=tp['T2 responses'],
+                                            responses=tp['T2 keys'],
                                             max_time=tp['max response time'])
         self.t2_rt = timer.getTime()
 
-        tp['t1_hit'] = tp['T1 correct response'] == self.t1_response
-        tp['t2_hit'] = tp['T2 correct response'] == self.t2_response
+        self.t1_hit = tp['T1 correct response'] == self.t1_response
+        self.t2_hit = tp['T2 correct response'] == self.t2_response
 
         # save trial data
         self.updateTrialLog(tp)

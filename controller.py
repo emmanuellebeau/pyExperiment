@@ -23,6 +23,7 @@ class PupilLogging():
         """
 def getSubjectInfo(experiment_name='my name', n_sessions=2, n_runs=2):
     subject_data = {}
+    print(experiment_name)
     subject_data['subject_id'] = input('sub: ')
     subject_data['age'] = int(input('age: '))
     subject_data['run'] = int(input('run: '))
@@ -76,7 +77,7 @@ class Controller(EEGLogging, PupilLogging):
         self.experiment_name = name
         self.n_sessions = n_sessions
         self.n_runs = n_runs
-        subject_info = getSubjectInfo()
+        subject_info = getSubjectInfo(name, n_sessions, n_runs)
         self.subject_id = subject_info['subject_id']
         self.age = subject_info['age']
         self.session = subject_info['session']

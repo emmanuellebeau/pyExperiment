@@ -19,6 +19,21 @@ myGabor.draw()
 win.flip()
 core.wait(6)
 
+class Parent():
+    def __init__(self, a):
+        self.a = a
+        self.f = f
+    def print_a(self):
+        print(self.a)
+
+class Child(Parent):
+    def __init__(self, **args):
+        super(Child, self).__init__(**args)
+        self.c = 111
+
+b = Child(a='dfd')
+
+
 #create a window
 # def getinfo():
 #     myDlg = gui.Dlg(title="This experiment")
