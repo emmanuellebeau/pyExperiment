@@ -14,14 +14,14 @@ TODO:
 
 # define trial settings
 fix_time = 0.5
-img_dur = 0.02
+img_dur = 0.012
 SOA = 0.1
-n_trials = 10
+n_trials = 10 # per block
 t1_pos = 5
 t2_pos = 7
 RSVP_len = 12
 n_masks = 20
-im_size = 5 # in degrees
+im_size = 8 # in degrees
 n_blocks = 2
 max_response_time = 2.5
 """
@@ -43,9 +43,9 @@ trial_dict = {
             'T2 options': None, # list of keys
             'T1 menu': None, # list of drawable objects shown as alternatives
             'T2 menu': None, # list of drawable objects shown as alternatives
-            # at what position to draw the menu
+            # at what position to draw the menu items
             # first two are images, last position is for the text
-            'Menu pos': ([-4, 0], [4, 0], [0, 4]),
+            'Menu pos': ([-6, 0], [6, 0], [0, 6]),
             'Response keys': keys, # possible key responses
             'T1 correct response': None, # correct key response for T1
             'T2 correct response': None  # correct key response for T2
@@ -58,9 +58,11 @@ ab = AB(distance_to_screen=200, name='AB')
 Preload images and the masks turn them into textures
 """
 info_txt = RU.loadInfoTxt()
+
 # Load images
 images = RU.load_AB_images()
 n_images = len(images)
+
 img_textures = []
 for i in range(n_images):
     progressBar(ab.win, i, n_images,
@@ -86,7 +88,6 @@ for block in range(n_blocks):
 
     # Create all the trials for the block
     for i in range(n_trials):
-
         # Pick targets and create RSVP sequence
         T1 = rchoice(range(n_images), 1)[0]
         T2 = rchoice(range(n_images), 1)[0]
@@ -109,13 +110,12 @@ for block in range(n_blocks):
 
         # create text instances for menu
         menu_txt = visual.TextStim(ab.win,
-                text='Which one was the first target', pos=(0, 4), height=0.5)
+                text='Which one was the first target', height=0.7)
         menu_txt2 = visual.TextStim(ab.win,
-                text='Which one was the second target', pos=(0, 4), height=0.5)
+                text='Which one was the second target', height=0.7)
 
         T1_menu = [img_textures[x] for i, x in enumerate(T1_opt)]
         T1_menu.append(menu_txt)
-        print(T1_menu)
 
         T2_menu = [img_textures[x] for i, x in enumerate(T2_opt)]
         T2_menu.append(menu_txt2)

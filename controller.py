@@ -102,23 +102,18 @@ class Controller(EEGLogging, PupilLogging):
                   f'ses-{self.session:02d}_run-{self.run:02d}_log.log'
 
         LOG_FORMAT = "%(levelname)s - %(asctime)s - %(message)s"
-        logging.basicConfig(filename=logname,
-                            level=10, format=LOG_FORMAT)
+        logging.basicConfig(filename=logname, level=20, format=LOG_FORMAT)
 
         return logging.getLogger()
 
 
-    def log(self, text, level='info'):
+    def log(self, text):
         """
         Todo
             add EEG and eyelink logging
         """
-        if level=='info':
-            self.logger.info(text)
-        elif level=='warning':
-            self.logger.warning(text)
-        elif level=='error':
-            self.logger.error(text)
+        self.logger.info(text)
+
 
     def start(self, run_before=False, run_after=False):
         """

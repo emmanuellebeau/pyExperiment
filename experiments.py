@@ -82,7 +82,7 @@ class AB(Controller):
 
         # create log file
         header = ['Subject', 'TrialType', 'Session', 'run', 'Trial', 'T1',
-                  'T2', 'T1menu', 'T2menu', 'T1rest', 'T2resp',
+                  'T2', 'T1menu', 'T2menu', 'T1resp', 'T2resp',
                   'T1RT', 'T2RT', 'T1hit', 'T2hit']
         with open(self.trial_log_name, 'w') as f:
             f.write('\t'.join(header) + '\n')
