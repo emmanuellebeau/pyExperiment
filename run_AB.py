@@ -71,7 +71,7 @@ for i in range(n_images):
     img_textures.append(ImageStim(ab.win, images[i], name=f'{i}',
                                   size=im_size,  flipVert=True))
 # load masks
-masks = RU.createImageMasks(images, n_masks)
+masks = RU.createImageMasks(images, n_masks, 25)
 mask_textures = []
 for i in range(n_masks):
     progressBar(ab.win, i, n_masks,
@@ -92,13 +92,18 @@ for block in range(n_blocks):
         # Pick targets and create RSVP sequence
         T1 = rchoice(range(n_images), 1)[0]
         T2 = rchoice(range(n_images), 1)[0]
+
         # Randomly pick RSVP_len number of masks
         trial_sequence = [mask_textures[np.random.randint(n_masks)]
                                         for x in range(RSVP_len)]
 
         # Replace the T1 and T2 positions with the targets
-        trial_sequence[t1_pos] = img_textures[T1]
-        trial_sequence[t2_pos] = img_textures[T2]
+        t1img = img_textures[T1]
+        t1img.name = f'T1 {T1}'
+        t2img = img_textures[T2]
+        t2img.name = f'T2 {T2}'
+        trial_sequence[t1_pos] = t1img
+        trial_sequence[t2_pos] = t2img
 
         # Make menu options
         possible_menu_options = np.setdiff1d(range(n_images), [T1, T2])

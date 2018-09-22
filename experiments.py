@@ -177,14 +177,14 @@ class AB(Controller):
         # total frames
         n_frames = f_SOA*len(tp['trial sequence'])
         frames = np.arange(n_frames)
-
+        img_frames = np.array([np.arange(f_per_img)+x for x in frames[::f_SOA]]).flatten()
         # begin RSVP
         i = 0
         # just to make sure we aren't sending the same log message twice
         _i = -1
         self.formattedLog('Start of RSVP')
         for frame in frames:
-            if frame in frames[::f_SOA]:
+            if frame in img_frames:
                 im = tp['trial sequence'][i]
                 im.setPos((0, 0))
                 im.draw()
