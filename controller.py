@@ -1,4 +1,5 @@
-from psychopy import gui
+#from psychopy import gui
+import GUI as gui
 from psychopy import core
 import sys, logging, os
 
@@ -23,6 +24,8 @@ class PupilLogging():
             fix connection for messages to eyelink
         """
 def getSubjectInfo(experiment_name='my name', n_sessions=2, n_runs=2):
+    # info = gui.GetSubjectInfo(experiment_name)
+    # return info.info
     subject_data = {}
     print(experiment_name)
     subject_data['subject_id'] = input('sub: ')

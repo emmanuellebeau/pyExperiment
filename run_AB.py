@@ -31,7 +31,6 @@ the first key corresponds to the first alternative in the menu
 here z corresponds to the left object, and m to the right in the menu
 """
 keys = ['z', 'm']
-
 trial_dict = {
             'trial sequence':None, # list of named psychopy objects to draw
             'fixation time': fix_time,
