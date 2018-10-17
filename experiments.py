@@ -274,7 +274,7 @@ class NBackExperiment(Controller):
 
         """
         trial_info = [self.subject_id, tp['n back'], self.session,
-                      self.run, self.trial, tp['target image'], self.response,
+                      self.run, self.trial, tp['image ID'], self.response,
                       self.rt, self.hit]
         trial_info = [str(x) for x in trial_info]
         with open(self.trial_log_name, 'a') as f:
@@ -331,6 +331,7 @@ class NBackExperiment(Controller):
 
         # log trial start
         self.formattedLog('Start of trial')
+        self.formattedLog(f'Showing image {tp['image ID']}')
         event.clearEvents()
         response_made = False
         self.response = '-1'

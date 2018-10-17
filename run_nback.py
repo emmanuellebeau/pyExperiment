@@ -80,6 +80,7 @@ for block in range(n_blocks):
     for i in range(n_trials):
         # Add specifics to trial_dict
         trial_dict['target image'] = img_textures[trial_order[i]]
+        trial_dict['image ID'] = i
         # first trial can't be n-back
         if i == 0:
             trial_dict['n back'] = False
