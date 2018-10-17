@@ -331,7 +331,8 @@ class NBackExperiment(Controller):
 
         # log trial start
         self.formattedLog('Start of trial')
-        self.formattedLog(f'Showing image {tp['image ID']}')
+        image_id = tp['image ID']
+        self.formattedLog(f'Showing image {image_id}')
         event.clearEvents()
         response_made = False
         self.response = '-1'

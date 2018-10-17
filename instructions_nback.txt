@@ -1,2 +1,4 @@
 This is the instructions for the n-back
+Press Z to indicate that this images the same as the previous image
+Press M to indicate no
 Press space to start
