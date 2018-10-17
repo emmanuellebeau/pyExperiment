@@ -230,3 +230,137 @@ class AB(Controller):
         # save trial data
         self.updateTrialLog(tp)
         self.formattedLog('End of trial')
+
+class NBackExperiment(Controller):
+    """
+    Todo:
+        Write this doc string
+    """
+    def __init__(self, distance_to_screen=60, monitor='testMonitor',
+                 fullscr=True, **args):
+        super(NBackExperiment, self).__init__(**args)
+        self.win = visual.Window([1024,768], fullscr=fullscr, screen=1,
+                                 monitor=monitor, units="deg")
+        self.win.mouseVisible = False
+        self.secs_per_frame = 1/self.win.getActualFrameRate()
+        self._initTrialLog()
+
+    def _initTrialLog(self):
+        """
+        A more specific log for only saving necessary
+        trial by trial information
+        """
+        print('init trial log')
+        log_folder = 'n_back_results'
+        self.trial_log_name = f'{log_folder}/{self.subject_id}_task-'\
+                              f'{self.experiment_name}_ses-{self.session:02d}_'\
+                              f'run-{self.run:02d}_events.tsv'
+
+        # create folder
+        if not os.path.exists(log_folder):
+            os.mkdir(log_folder)
+
+        # create log file
+        header = ['Subject', 'Nback', 'Session', 'run', 'Trial', 'Image',
+                  'Response', 'RT', 'hit']
+        with open(self.trial_log_name, 'w') as f:
+            f.write('\t'.join(header) + '\n')
+
+    def updateTrialLog(self, tp):
+        """
+        Updates the trial log used
+
+        Notice that trial_info must follow the header defined in _initTrialLog
+
+        """
+        trial_info = [self.subject_id, tp['n back'], self.session,
+                      self.run, self.trial, tp['target image'], self.response,
+                      self.rt, self.hit]
+        trial_info = [str(x) for x in trial_info]
+        with open(self.trial_log_name, 'a') as f:
+            f.write('\t'.join(trial_info) + '\n')
+
+    def drawAndWait(self, obj_list, responses=[], max_time=False, pos=False):
+        """
+        parameters
+            obj: list of psychopy object with draw method
+            responses: list
+                list of keywords that will exit the loop
+        todo:
+            add possibility of time limit
+        """
+        event.clearEvents()
+        start = core.Clock()
+        while True:
+            if max_time:
+                if start.getTime() > max_time:
+                    return 'time out'
+            key = get_keypress(self)
+            if key and key in responses:
+                return key
+            event.clearEvents()
+            for i, obj in enumerate(obj_list):
+                if pos:
+                    obj.setPos(pos[i])
+                obj.draw()
+            self.win.flip()
+
+    def formattedLog(self, msg):
+        self.log(f'{msg} - trial - {self.trial} - '\
+                 f'{self.trial_start.getTime()} - block - {self.block} - '\
+                 f'{self.block_start.getTime()} - run - {self.run} - '\
+                 f'{self.run_start.getTime()}')
+
+    def runTrial(self, tp):
+        """
+        Parameters
+            tp: dict
+                contains fields for the following:
+                        'target image':None, # list of named psychopy objects to draw
+                        'img duration' # how long to show each image
+                        'trial length' # length of trial
+                        'max response time' # length of response period
+                        'correct response': # target key
+                        'possible responses' # list of possible responses
+        """
+        # fixation object
+        fixation = visual.GratingStim(win=self.win, size=0.4,
+                                      pos=[0,0], sf=0, rgb=-1)
+        # start trial clock
+        self.trial_start = core.Clock()
+
+        # log trial start
+        self.formattedLog('Start of trial')
+        event.clearEvents()
+        response_made = False
+        self.response = '-1'
+        self.rt = -1
+        while True:
+            # key logger
+            if not response_made and self.trial_start.getTime() < tp['max response time']:
+                key = get_keypress(self)
+                if key and key in tp['possible responses']:
+                    self.rt = self.trial_start.getTime()
+                    self.response = key
+                    response_made = True
+
+            # if trial is over here
+            if self.trial_start.getTime() > tp['trial length']:
+                break
+
+            # Only draw the image during the defined image duration
+            if self.trial_start.getTime() < tp['img duration']:
+                im = tp['target image']
+                im.setPos((0, 0))
+                im.draw()
+
+            # otherwise draw a fixation
+            else:
+                fixation.draw()
+            self.win.flip()
+        self.formattedLog('End of trial')
+
+        self.hit = tp['correct response'] == self.response
+
+        # save trial data
+        self.updateTrialLog(tp)
