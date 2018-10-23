@@ -33,7 +33,7 @@ trial_dict = {
             'trial length': trial_length,
             'max response time': max_response_time,
             'correct response': None , # correct key response
-            'possible responses': ['z', 'm'] # yes and no
+            'possible responses': ['z'] # yes
             }
 
 # initiate AB class
@@ -71,10 +71,22 @@ for block in range(n_blocks):
     trial_order = np.repeat(range(n_images),3)
     n_trials = len(trial_order)
     np.random.shuffle(trial_order)
+
+    # let's fix this to prevent unbalanced trial numbers
+    trial_order = np.c_[trial_order, np.ones(n_trials)*np.nan]
+
     # lets randomly add a few n_backs
     for i in range(20):
         randt = np.random.choice(range(1, n_trials),1)[0]
-        trial_order[randt] = trial_order[randt-1]
+        # replace the NaN of the second column by the value of randt (random trial)
+        trial_order[randt,1] = trial_order[randt]
+
+    # vectorise and remove all NaNs    
+    trial_order = trial_order.flatten()
+    trial_order=trial_order[np.isfinite(trial_order)]
+    
+    # reset n_trials to account for the nbacks
+    n_trials = len(trial_order)
 
     # Create all the trials for the block
     for i in range(n_trials):
@@ -92,7 +104,7 @@ for block in range(n_blocks):
                 trial_dict['correct response'] = 'z'
             else:
                 trial_dict['n back'] = False
-                trial_dict['correct response'] = 'm'
+                #trial_dict['correct response'] = None
 
         nback.addTrial(trial_dict.copy())
 
