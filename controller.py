@@ -1,4 +1,5 @@
 #from psychopy import gui
+#import GUI as gui
 from psychopy import core
 import sys, logging, os
 

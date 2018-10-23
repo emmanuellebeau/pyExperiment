@@ -237,7 +237,7 @@ class NBackExperiment(Controller):
         Write this doc string
     """
     def __init__(self, distance_to_screen=60, monitor='testMonitor',
-                 fullscr=True, **args):
+                 fullscr=False, **args):
         super(NBackExperiment, self).__init__(**args)
         self.win = visual.Window([1024,768], fullscr=fullscr, screen=1,
                                  monitor=monitor, units="deg")
@@ -335,7 +335,7 @@ class NBackExperiment(Controller):
         self.formattedLog(f'Showing image {image_id}')
         event.clearEvents()
         response_made = False
-        self.response = '-1'
+        self.response = None
         self.rt = -1
         while True:
             # key logger
