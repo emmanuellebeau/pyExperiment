@@ -75,7 +75,7 @@ class RTs(Controller):
         """
         print('init trial log')
         log_folder = 'RTs_results'
-        self.trial_log_name = f'{log_folder}/{self.subject_id}_task-'\
+        self.trial_log_name = f'{log_folder}/sub-{self.subject_id}_task-'\
                               f'{self.experiment_name}_ses-{self.session:02d}_'\
                               f'run-{self.run:02d}_events.tsv'
 

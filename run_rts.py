@@ -3,6 +3,7 @@ from psychopy.visual import ImageStim
 import os
 import numpy as np
 from numpy.random import choice as rchoice
+from numpy.random import random
 from experiments import *
 import runUtils as RU
 
@@ -79,6 +80,12 @@ for block in range(n_blocks):
         # Add specifics to trial_dict
         trial_dict['target image'] = img_textures[int(i)]
         trial_dict['image ID'] = int(i)
+
+        # add some jitter and update trial_dict
+        jitter = random() * (0 - 0.5) + 0.5  # generate a number between 0 and 0.5
+        jitISI = round(jitter, 1)
+
+        trial_dict['trial length'] = trial_length - jitISI   
         
         if i<n_images/2:
             trial_dict['category'] = 1
