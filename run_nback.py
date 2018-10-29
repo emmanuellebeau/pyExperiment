@@ -79,7 +79,7 @@ for block in range(n_blocks):
     for i in range(20):
         randt = np.random.choice(range(1, n_trials),1)[0]
         # replace the NaN of the second column by the value of randt (random trial)
-        trial_order[randt,1] = trial_order[randt]
+        trial_order[randt,1] = trial_order[randt,0]
 
     # vectorise and remove all NaNs    
     trial_order = trial_order.flatten()
@@ -88,10 +88,12 @@ for block in range(n_blocks):
     # reset n_trials to account for the nbacks
     n_trials = len(trial_order)
 
+    print(f'######\n######\n trial order: \n {trial_order} \n######\n######\n')
+
     # Create all the trials for the block
     for i in range(n_trials):
         # Add specifics to trial_dict
-        trial_dict['target image'] = img_textures[trial_order[i]]
+        trial_dict['target image'] = img_textures[int(trial_order[i])]
         trial_dict['image ID'] = trial_order[i]
         # first trial can't be n-back
         if i == 0:
