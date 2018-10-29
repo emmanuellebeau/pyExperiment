@@ -62,7 +62,7 @@ for block in range(n_blocks):
         # if the first block, show instructions
         info_message = visual.TextStim(exp.win, text=info_txt,
                                        pos=(0, 0), height=0.5)
-        params = {'win': exp.win, 'obj_list': [info_message], 'responses': ['space']}
+        params = {'class_obj': exp, 'obj_list': [info_message], 'responses': ['space']}
         drawAndWait(**params)
 
     # Make a list of numbers representing which order each image will be
@@ -103,5 +103,5 @@ for block in range(n_blocks):
                     f'Press space to continue'
         info_message = visual.TextStim(exp.win, text=block_txt,
                                        pos=(0, 0), height=0.5)
-    params = {'win': exp.win, 'obj_list': [info_message], 'responses': ['space']}
+    params = {'class_obj': exp, 'obj_list': [info_message], 'responses': ['space']}
     exp.start(run_after=[(drawAndWait, params)])

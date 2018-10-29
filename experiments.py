@@ -22,7 +22,7 @@ def get_keypress(class_obj):
     else:
         return False
 
-def drawAndWait(win, obj_list, responses=[], max_time=False, pos=False):
+def drawAndWait(class_obj, obj_list, responses=[], max_time=False, pos=False):
     """
     parameters
         obj: list of psychopy object with draw method
@@ -37,7 +37,7 @@ def drawAndWait(win, obj_list, responses=[], max_time=False, pos=False):
         if max_time:
             if start.getTime() > max_time:
                 return 'time out'
-        key = get_keypress(self)
+        key = get_keypress(class_obj)
         if key and key in responses:
             return key
         event.clearEvents()
@@ -45,7 +45,23 @@ def drawAndWait(win, obj_list, responses=[], max_time=False, pos=False):
             if pos:
                 obj.setPos(pos[i])
             obj.draw()
-        win.flip()
+        class_obj.win.flip()
+
+def _initTrialLog(log_name, column_headers):
+    """
+    A more specific log for only saving necessary
+    trial by trial information
+    parameters:
+        log_names: str
+            path to log (folder hierarchy will be checked)
+        column_headers: list of strings
+            list of each columns header (need to be in correct order)
+    """
+    if os.path.dirname(log_name) != '':
+        assert os.path.isdir(log_name), f'{os.path.dirname(log_name)} does not exist'
+
+    with open(log_name, 'w') as f:
+        f.write('\t'.join(column_headers) + '\n')
 
 def progressBar(win, i, n, load_txt='Loading'):
     """
@@ -318,7 +334,7 @@ class AB(Controller):
         # draw menu for T1
         timer = core.Clock()
         self.formattedLog('T1 menu')
-        self.t1_response = drawAndWait(self.win, tp['T1 menu'],
+        self.t1_response = drawAndWait(self, tp['T1 menu'],
                                             responses=tp['Response keys'],
                                             max_time=tp['max response time'],
                                             pos=tp['Menu pos'])
@@ -328,7 +344,7 @@ class AB(Controller):
         # draw menu for T2
         timer = core.Clock()
         self.formattedLog('T2 menu')
-        self.t2_response = drawAndWait(self.win, tp['T2 menu'],
+        self.t2_response = drawAndWait(self, tp['T2 menu'],
                                             responses=tp['Response keys'],
                                             max_time=tp['max response time'],
                                             pos=tp['Menu pos'])
