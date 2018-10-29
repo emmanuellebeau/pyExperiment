@@ -62,8 +62,8 @@ for block in range(n_blocks):
         # if the first block, show instructions
         info_message = visual.TextStim(exp.win, text=info_txt,
                                        pos=(0, 0), height=0.5)
-        params = {'obj_list': [info_message], 'responses': ['space']}
-        exp.drawAndWait(**params)
+        params = {'win': exp.win, 'obj_list': [info_message], 'responses': ['space']}
+        drawAndWait(**params)
 
     # Make a list of numbers representing which order each image will be
     # presented in. For simplicity I'm just gonna present image of the
@@ -85,8 +85,8 @@ for block in range(n_blocks):
         jitter = random() * (0 - 0.5) + 0.5  # generate a number between 0 and 0.5
         jitISI = round(jitter, 1)
 
-        trial_dict['trial length'] = trial_length - jitISI   
-        
+        trial_dict['trial length'] = trial_length - jitISI
+
         if i<n_images/2:
             trial_dict['category'] = 1
         else:
@@ -103,5 +103,5 @@ for block in range(n_blocks):
                     f'Press space to continue'
         info_message = visual.TextStim(exp.win, text=block_txt,
                                        pos=(0, 0), height=0.5)
-    params = {'obj_list': [info_message], 'responses': ['space']}
-    exp.start(run_after=[(exp.drawAndWait, params)])
+    params = {'win': exp.win, 'obj_list': [info_message], 'responses': ['space']}
+    exp.start(run_after=[(drawAndWait, params)])

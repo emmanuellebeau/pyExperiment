@@ -72,8 +72,8 @@ for block in range(n_blocks):
         # if the first block, show instructions
         info_message = visual.TextStim(ab.win, text=info_txt,
                                        pos=(0, 0), height=0.5)
-        params = {'obj_list': [info_message], 'responses': ['space']}
-        ab.drawAndWait(**params)
+        params = {'win': ab.win, 'obj_list': [info_message], 'responses': ['space']}
+        drawAndWait(**params)
     # Get masks
     masks = createRadialMasks(ab.win, n_masks)
     for i in range(n_trials):
@@ -126,5 +126,5 @@ for block in range(n_blocks):
                     f'Press space to continue'
         info_message = visual.TextStim(ab.win, text=block_txt,
                                        pos=(0, 0), height=0.5)
-    params = {'obj_list': [info_message], 'responses': ['space']}
-    ab.start(run_after=[(ab.drawAndWait, params)])
+    params = {'win': ab.win, 'obj_list': [info_message], 'responses': ['space']}
+    ab.start(run_after=[(drawAndWait, params)])

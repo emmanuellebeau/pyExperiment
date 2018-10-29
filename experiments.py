@@ -22,6 +22,31 @@ def get_keypress(class_obj):
     else:
         return False
 
+def drawAndWait(win, obj_list, responses=[], max_time=False, pos=False):
+    """
+    parameters
+        obj: list of psychopy object with draw method
+        responses: list
+            list of keywords that will exit the loop
+    todo:
+        add possibility of time limit
+    """
+    event.clearEvents()
+    start = core.Clock()
+    while True:
+        if max_time:
+            if start.getTime() > max_time:
+                return 'time out'
+        key = get_keypress(self)
+        if key and key in responses:
+            return key
+        event.clearEvents()
+        for i, obj in enumerate(obj_list):
+            if pos:
+                obj.setPos(pos[i])
+            obj.draw()
+        win.flip()
+
 def progressBar(win, i, n, load_txt='Loading'):
     """
     Progress bar
@@ -66,8 +91,8 @@ class RTs(Controller):
                                  monitor=monitor, units="deg")
         self.win.mouseVisible = False
         self.secs_per_frame = 1/self.win.getActualFrameRate()
-        self._initTrialLog()   
-        
+        self._initTrialLog()
+
     def _initTrialLog(self):
         """
         A more specific log for only saving necessary
@@ -103,30 +128,6 @@ class RTs(Controller):
         with open(self.trial_log_name, 'a') as f:
             f.write('\t'.join(trial_info) + '\n')
 
-    def drawAndWait(self, obj_list, responses=[], max_time=False, pos=False):
-        """
-        parameters
-            obj: list of psychopy object with draw method
-            responses: list
-                list of keywords that will exit the loop
-        todo:
-            add possibility of time limit
-        """
-        event.clearEvents()
-        start = core.Clock()
-        while True:
-            if max_time:
-                if start.getTime() > max_time:
-                    return 'time out'
-            key = get_keypress(self)
-            if key and key in responses:
-                return key
-            event.clearEvents()
-            for i, obj in enumerate(obj_list):
-                if pos:
-                    obj.setPos(pos[i])
-                obj.draw()
-            self.win.flip()
 
     def formattedLog(self, msg):
         self.log(f'{msg} - trial - {self.trial} - '\
@@ -188,7 +189,7 @@ class RTs(Controller):
         self.hit = tp['correct response'] == self.response
 
         # save trial data
-        self.updateTrialLog(tp)       
+        self.updateTrialLog(tp)
 
 
 class AB(Controller):
@@ -240,30 +241,6 @@ class AB(Controller):
         with open(self.trial_log_name, 'a') as f:
             f.write('\t'.join(trial_info) + '\n')
 
-    def drawAndWait(self, obj_list, responses=[], max_time=False, pos=False):
-        """
-        parameters
-            obj: list of psychopy object with draw method
-            responses: list
-                list of keywords that will exit the loop
-        todo:
-            add possibility of time limit
-        """
-        event.clearEvents()
-        start = core.Clock()
-        while True:
-            if max_time:
-                if start.getTime() > max_time:
-                    return 'time out'
-            key = get_keypress(self)
-            if key and key in responses:
-                return key
-            event.clearEvents()
-            for i, obj in enumerate(obj_list):
-                if pos:
-                    obj.setPos(pos[i])
-                obj.draw()
-            self.win.flip()
 
     def formattedLog(self, msg):
         self.log(f'{msg} - trial - {self.trial} - '\
@@ -341,7 +318,7 @@ class AB(Controller):
         # draw menu for T1
         timer = core.Clock()
         self.formattedLog('T1 menu')
-        self.t1_response = self.drawAndWait(tp['T1 menu'],
+        self.t1_response = drawAndWait(self.win, tp['T1 menu'],
                                             responses=tp['Response keys'],
                                             max_time=tp['max response time'],
                                             pos=tp['Menu pos'])
@@ -351,7 +328,7 @@ class AB(Controller):
         # draw menu for T2
         timer = core.Clock()
         self.formattedLog('T2 menu')
-        self.t2_response = self.drawAndWait(tp['T2 menu'],
+        self.t2_response = drawAndWait(self.win, tp['T2 menu'],
                                             responses=tp['Response keys'],
                                             max_time=tp['max response time'],
                                             pos=tp['Menu pos'])
@@ -416,31 +393,6 @@ class NBackExperiment(Controller):
         trial_info = [str(x) for x in trial_info]
         with open(self.trial_log_name, 'a') as f:
             f.write('\t'.join(trial_info) + '\n')
-
-    def drawAndWait(self, obj_list, responses=[], max_time=False, pos=False):
-        """
-        parameters
-            obj: list of psychopy object with draw method
-            responses: list
-                list of keywords that will exit the loop
-        todo:
-            add possibility of time limit
-        """
-        event.clearEvents()
-        start = core.Clock()
-        while True:
-            if max_time:
-                if start.getTime() > max_time:
-                    return 'time out'
-            key = get_keypress(self)
-            if key and key in responses:
-                return key
-            event.clearEvents()
-            for i, obj in enumerate(obj_list):
-                if pos:
-                    obj.setPos(pos[i])
-                obj.draw()
-            self.win.flip()
 
     def formattedLog(self, msg):
         self.log(f'{msg} - trial - {self.trial} - '\

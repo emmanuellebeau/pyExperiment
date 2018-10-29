@@ -61,8 +61,8 @@ for block in range(n_blocks):
         # if the first block, show instructions
         info_message = visual.TextStim(nback.win, text=info_txt,
                                        pos=(0, 0), height=0.5)
-        params = {'obj_list': [info_message], 'responses': ['space']}
-        nback.drawAndWait(**params)
+        params = {'win': nback.win, 'obj_list': [info_message], 'responses': ['space']}
+        drawAndWait(**params)
 
     # Make a list of numbers representing which order each image will be
     # presented in. For simplicity I'm just gonna present image of the
@@ -81,10 +81,10 @@ for block in range(n_blocks):
         # replace the NaN of the second column by the value of randt (random trial)
         trial_order[randt,1] = trial_order[randt,0]
 
-    # vectorise and remove all NaNs    
+    # vectorise and remove all NaNs
     trial_order = trial_order.flatten()
     trial_order=trial_order[np.isfinite(trial_order)]
-    
+
     # reset n_trials to account for the nbacks
     n_trials = len(trial_order)
 
@@ -119,5 +119,5 @@ for block in range(n_blocks):
                     f'Press space to continue'
         info_message = visual.TextStim(nback.win, text=block_txt,
                                        pos=(0, 0), height=0.5)
-    params = {'obj_list': [info_message], 'responses': ['space']}
-    nback.start(run_after=[(nback.drawAndWait, params)])
+    params = {'win': nback.win, 'obj_list': [info_message], 'responses': ['space']}
+    nback.start(run_after=[(drawAndWait, params)])
