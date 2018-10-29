@@ -1,0 +1,4 @@
+In this task you will be presented with visual images
+On each trial, press the keyboard key Z when the image shown is an animate object.
+Press the keyboard key M if the object is inanimate.
+Press space to start

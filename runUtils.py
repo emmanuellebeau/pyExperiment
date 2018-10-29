@@ -12,7 +12,7 @@ TODO:
     fix dialogue box for getting responses
 """
 
-def load_AB_images(stim_folder='stim/'):
+def load_images(stim_folder='stim/'):
     """
     images should be numbered and named: image_xx.jpg
     """

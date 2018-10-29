@@ -60,7 +60,7 @@ Preload images and the masks turn them into textures
 info_txt = RU.loadInfoTxt('instructions.txt')
 
 # Load images
-images = RU.load_AB_images()
+images = RU.load_images()
 n_images = len(images)
 
 img_textures = []

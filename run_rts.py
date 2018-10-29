@@ -33,16 +33,16 @@ trial_dict = {
             'trial length': trial_length,
             'max response time': max_response_time,
             'correct response': None , # correct key response
-            'possible responses': ['z'] # yes
+            'possible responses': ['z', 'm'] # yes
             }
 
 # initiate AB class
-nback = NBackExperiment(distance_to_screen=200, name='n_back')
+exp = RTs(distance_to_screen=200, name='rts')
 
 """
 Preload images and the masks turn them into textures
 """
-info_txt = RU.loadInfoTxt('instructions_nback.txt')
+info_txt = RU.loadInfoTxt('instructions_rts.txt')
 
 # Load images
 images = RU.load_images()
@@ -50,19 +50,19 @@ n_images = len(images)
 
 img_textures = []
 for i in range(n_images):
-    progressBar(nback.win, i, n_images,
+    progressBar(exp.win, i, n_images,
                 load_txt=f'Loading images')
-    img_textures.append(ImageStim(nback.win, images[i], name=f'{i}',
+    img_textures.append(ImageStim(exp.win, images[i], name=f'{i}',
                                   size=im_size,  flipVert=True))
 
 # Start looping over blocks
 for block in range(n_blocks):
     if block == 0:
         # if the first block, show instructions
-        info_message = visual.TextStim(nback.win, text=info_txt,
+        info_message = visual.TextStim(exp.win, text=info_txt,
                                        pos=(0, 0), height=0.5)
         params = {'obj_list': [info_message], 'responses': ['space']}
-        nback.drawAndWait(**params)
+        exp.drawAndWait(**params)
 
     # Make a list of numbers representing which order each image will be
     # presented in. For simplicity I'm just gonna present image of the
@@ -72,52 +72,29 @@ for block in range(n_blocks):
     n_trials = len(trial_order)
     np.random.shuffle(trial_order)
 
-    # let's fix this to prevent unbalanced trial numbers
-    trial_order = np.c_[trial_order, np.ones(n_trials)*np.nan]
-
-    # lets randomly add a few n_backs
-    for i in range(20):
-        randt = np.random.choice(range(1, n_trials),1)[0]
-        # replace the NaN of the second column by the value of randt (random trial)
-        trial_order[randt,1] = trial_order[randt,0]
-
-    # vectorise and remove all NaNs    
-    trial_order = trial_order.flatten()
-    trial_order=trial_order[np.isfinite(trial_order)]
-    
-    # reset n_trials to account for the nbacks
-    n_trials = len(trial_order)
-
     print(f'######\n######\n trial order: \n {trial_order} \n######\n######\n')
 
     # Create all the trials for the block
-    for i in range(n_trials):
+    for i in trial_order:
         # Add specifics to trial_dict
-        trial_dict['target image'] = img_textures[int(trial_order[i])]
-        trial_dict['image ID'] = trial_order[i]
-        # first trial can't be n-back
-        if i == 0:
-            trial_dict['n back'] = False
-            trial_dict['correct response'] = 'm'
+        trial_dict['target image'] = img_textures[int(i)]
+        trial_dict['image ID'] = int(i)
+        
+        if i<n_images/2:
+            trial_dict['category'] = 1
         else:
-            # if this image is the same as previous trial
-            if trial_order[i] == trial_order[i-1]:
-                trial_dict['n back'] = True
-                trial_dict['correct response'] = 'z'
-            else:
-                trial_dict['n back'] = False
-                #trial_dict['correct response'] = None
+            trial_dict['category'] = 2
 
-        nback.addTrial(trial_dict.copy())
+        exp.addTrial(trial_dict.copy())
 
     if block == n_blocks-1: # if last block
-        block_txt = f'End of run {nback.run}\nPress space to continue'
-        info_message = visual.TextStim(nback.win, text=block_txt,
+        block_txt = f'End of run {exp.run}\nPress space to continue'
+        info_message = visual.TextStim(exp.win, text=block_txt,
                                        pos=(0, 0), height=0.5)
     else:
         block_txt = f'End of block {block+1}/{n_blocks}\n'\
                     f'Press space to continue'
-        info_message = visual.TextStim(nback.win, text=block_txt,
+        info_message = visual.TextStim(exp.win, text=block_txt,
                                        pos=(0, 0), height=0.5)
     params = {'obj_list': [info_message], 'responses': ['space']}
-    nback.start(run_after=[(nback.drawAndWait, params)])
+    exp.start(run_after=[(exp.drawAndWait, params)])
