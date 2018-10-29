@@ -8,6 +8,17 @@ logging.console.setLevel(logging.CRITICAL)
 """
 A selection of experiment classes
 """
+
+def createFolderHierarchy(folders):
+    p = os.path.normpath(folders)
+    p = p.split(os.sep)
+    paths = p[0]
+    for i in range(len(paths)):
+        if not os.path.isdir(paths):
+            os.mkdir(paths)
+        if i < len(p)-1:
+            paths = os.path.join(paths, p[i+1])
+
 def shutdown(class_obj):
     print('Aborted by user!')
     class_obj.win.close()
@@ -20,7 +31,7 @@ def get_keypress(class_obj):
             shutdown(class_obj)
         return keys[0]
     else:
-        return False
+        return None
 
 def drawAndWait(class_obj, obj_list, responses=[], max_time=False, pos=False):
     """
@@ -47,7 +58,7 @@ def drawAndWait(class_obj, obj_list, responses=[], max_time=False, pos=False):
             obj.draw()
         class_obj.win.flip()
 
-def _initTrialLog(log_name, column_headers):
+def initTrialLog(log_name, column_headers):
     """
     A more specific log for only saving necessary
     trial by trial information
@@ -57,8 +68,9 @@ def _initTrialLog(log_name, column_headers):
         column_headers: list of strings
             list of each columns header (need to be in correct order)
     """
-    if os.path.dirname(log_name) != '':
-        assert os.path.isdir(log_name), f'{os.path.dirname(log_name)} does not exist'
+    result_folder = os.path.dirname(log_name)
+    if result_folder != '':
+        assert os.path.isdir(result_folder), f'{result_folder} does not exist'
 
     with open(log_name, 'w') as f:
         f.write('\t'.join(column_headers) + '\n')
@@ -107,28 +119,18 @@ class RTs(Controller):
                                  monitor=monitor, units="deg")
         self.win.mouseVisible = False
         self.secs_per_frame = 1/self.win.getActualFrameRate()
-        self._initTrialLog()
 
-    def _initTrialLog(self):
-        """
-        A more specific log for only saving necessary
-        trial by trial information
-        """
-        print('init trial log')
-        log_folder = 'RTs_results'
-        self.trial_log_name = f'{log_folder}/sub-{self.subject_id}_task-'\
-                              f'{self.experiment_name}_ses-{self.session:02d}_'\
-                              f'run-{self.run:02d}_events.tsv'
-
-        # create folder
-        if not os.path.exists(log_folder):
-            os.mkdir(log_folder)
-
-        # create log file
+        # setup trial log
+        folder = 'results/RTs'
+        createFolderHierarchy(folder)
+        log_name = f'sub-{self.subject_id}_task-'\
+                   f'{self.experiment_name}_ses-{self.session:02d}_'\
+                   f'run-{self.run:02d}_events.tsv'
+        self.trial_log_name = os.path.join(folder, log_name)
         header = ['Subject', 'Category', 'Session', 'run', 'Trial', 'Image',
                   'Response', 'RT', 'hit']
-        with open(self.trial_log_name, 'w') as f:
-            f.write('\t'.join(header) + '\n')
+        initTrialLog(self.trial_log_name, header)
+
 
     def updateTrialLog(self, tp):
         """
@@ -221,28 +223,17 @@ class AB(Controller):
         self.win.mouseVisible = False
         self.secs_per_frame = 1/self.win.getActualFrameRate()
         self.T1_accuracy = 0
-        self._initTrialLog()
-
-    def _initTrialLog(self):
-        """
-        A more specific log for only saving necessary
-        trial by trial information
-        """
-        print('init trial log')
-        self.trial_log_name = f'results/{self.subject_id}_task-'\
-                              f'{self.experiment_name}_ses-{self.session:02d}_'\
-                              f'run-{self.run:02d}_events.tsv'
-
-        # create folder
-        if not os.path.exists('results'):
-            os.mkdir('results')
-
-        # create log file
+        # setup trial file
+        folder = 'results/AB'
+        createFolderHierarchy(folder)
+        log_name = f'sub-{self.subject_id}_task-'\
+                   f'{self.experiment_name}_ses-{self.session:02d}_'\
+                   f'run-{self.run:02d}_events.tsv'
+        self.trial_log_name = os.path.join(folder, log_name)
         header = ['Subject', 'TrialType', 'Session', 'run', 'Trial', 'T1',
                   'T2', 'T1menu', 'T2menu', 'T1resp', 'T2resp',
                   'T1RT', 'T2RT', 'T1hit', 'T2hit']
-        with open(self.trial_log_name, 'w') as f:
-            f.write('\t'.join(header) + '\n')
+        initTrialLog(self.trial_log_name, header)
 
     def updateTrialLog(self, tp):
         """
@@ -373,28 +364,17 @@ class NBackExperiment(Controller):
                                  monitor=monitor, units="deg")
         self.win.mouseVisible = False
         self.secs_per_frame = 1/self.win.getActualFrameRate()
-        self._initTrialLog()
 
-    def _initTrialLog(self):
-        """
-        A more specific log for only saving necessary
-        trial by trial information
-        """
-        print('init trial log')
-        log_folder = 'n_back_results'
-        self.trial_log_name = f'{log_folder}/{self.subject_id}_task-'\
-                              f'{self.experiment_name}_ses-{self.session:02d}_'\
-                              f'run-{self.run:02d}_events.tsv'
-
-        # create folder
-        if not os.path.exists(log_folder):
-            os.mkdir(log_folder)
-
-        # create log file
+        # setup trial file
+        folder = 'results/nBack'
+        createFolderHierarchy(folder)
+        log_name = f'sub-{self.subject_id}_task-'\
+                   f'{self.experiment_name}_ses-{self.session:02d}_'\
+                   f'run-{self.run:02d}_events.tsv'
+        self.trial_log_name = os.path.join(folder, log_name)
         header = ['Subject', 'Nback', 'Session', 'run', 'Trial', 'Image',
                   'Response', 'RT', 'hit']
-        with open(self.trial_log_name, 'w') as f:
-            f.write('\t'.join(header) + '\n')
+        initTrialLog(self.trial_log_name, header)
 
     def updateTrialLog(self, tp):
         """

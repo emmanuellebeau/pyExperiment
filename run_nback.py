@@ -98,7 +98,7 @@ for block in range(n_blocks):
         # first trial can't be n-back
         if i == 0:
             trial_dict['n back'] = False
-            trial_dict['correct response'] = 'm'
+            trial_dict['correct response'] = None
         else:
             # if this image is the same as previous trial
             if trial_order[i] == trial_order[i-1]:
@@ -106,6 +106,7 @@ for block in range(n_blocks):
                 trial_dict['correct response'] = 'z'
             else:
                 trial_dict['n back'] = False
+                trial_dict['correct response'] = None
                 #trial_dict['correct response'] = None
 
         nback.addTrial(trial_dict.copy())
