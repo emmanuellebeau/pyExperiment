@@ -102,7 +102,7 @@ class Controller(EEGLogging, PupilLogging):
         """
         if not os.path.exists('logs'):
             os.mkdir('logs')
-        logname = f'logs/{self.subject_id}_task-{self.experiment_name}_'\
+        logname = f'logs/sub-{self.subject_id}_task-{self.experiment_name}_'\
                   f'ses-{self.session:02d}_run-{self.run:02d}_log.log'
 
         LOG_FORMAT = "%(levelname)s - %(asctime)s - %(message)s"
