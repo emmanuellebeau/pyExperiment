@@ -136,7 +136,7 @@ class RTs(Controller):
         """
         Updates the trial log used
 
-        Notice that trial_info must follow the header defined in _initTrialLog
+        Notice that trial_info must follow the header defined in initTrialLog
 
         """
         trial_info = [self.subject_id, tp['category'], self.session,

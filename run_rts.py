@@ -25,7 +25,7 @@ trial_length  = 2
 
 """
 Response options:
-here z corresponds to Yes, and m to No
+here z corresponds to Category 1, and m to Category 2
 """
 keys = ['z', 'm']
 trial_dict = {
@@ -37,11 +37,11 @@ trial_dict = {
             'possible responses': ['z', 'm'] # yes
             }
 
-# initiate AB class
+# initiate RTs class
 exp = RTs(distance_to_screen=200, name='rts')
 
 """
-Preload images and the masks turn them into textures
+Load the instructions and images 
 """
 info_txt = RU.loadInfoTxt('instructions_rts.txt')
 
@@ -66,7 +66,7 @@ for block in range(n_blocks):
         drawAndWait(**params)
 
     # Make a list of numbers representing which order each image will be
-    # presented in. For simplicity I'm just gonna present image of the
+    # presented in. For simplicity I'm just gonna present each image of the
     # 40 images 3 times per block, and shuffle it
 
     trial_order = np.repeat(range(n_images),3)
