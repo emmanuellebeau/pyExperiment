@@ -9,16 +9,6 @@ logging.console.setLevel(logging.CRITICAL)
 A selection of experiment classes
 """
 
-def createFolderHierarchy(folders):
-    p = os.path.normpath(folders)
-    p = p.split(os.sep)
-    paths = p[0]
-    for i in range(len(paths)):
-        if not os.path.isdir(paths):
-            os.mkdir(paths)
-        if i < len(p)-1:
-            paths = os.path.join(paths, p[i+1])
-
 def shutdown(class_obj):
     print('Aborted by user!')
     class_obj.win.close()
@@ -127,7 +117,7 @@ class RTs(Controller):
                    f'{self.experiment_name}_ses-{self.session:02d}_'\
                    f'run-{self.run:02d}_events.tsv'
         self.trial_log_name = os.path.join(folder, log_name)
-        header = ['Subject', 'Category', 'Session', 'run', 'Trial', 'Image',
+        header = ['Subject', 'Category', 'Session', 'run', 'Trial', 'Image','Category','Onset','Duration',
                   'Response', 'RT', 'hit']
         initTrialLog(self.trial_log_name, header)
 
@@ -140,7 +130,7 @@ class RTs(Controller):
 
         """
         trial_info = [self.subject_id, tp['category'], self.session,
-                      self.run, self.trial, tp['image ID'], self.response,
+                      self.run, self.trial, tp['image ID'], tp['category'], self.onset,self.duration, self.response,
                       self.rt, self.hit]
         trial_info = [str(x) for x in trial_info]
         with open(self.trial_log_name, 'a') as f:
@@ -162,23 +152,26 @@ class RTs(Controller):
                         'img duration' # how long to show each image
                         'trial length' # length of trial
                         'max response time' # length of response period
-                        'correct response': # target key
+                        'category': # target key
                         'possible responses' # list of possible responses
         """
         # fixation object
         fixation = visual.GratingStim(win=self.win, size=0.4,
                                       pos=[0,0], sf=0, rgb=-1)
-        # start trial clock
-        self.trial_start = core.Clock()
-
-        # log trial start
-        self.formattedLog('Start of trial')
-        image_id = tp['image ID']
-        self.formattedLog(f'Showing image {image_id}')
+        
+        stimIsOn = False
+        fixIsOn  = False
         event.clearEvents()
         response_made = False
         self.response = None
         self.rt = -1
+        
+        # define the image id
+        image_id = tp['image ID']
+        
+        # start trial clock
+        self.trial_start = core.Clock()              
+        
         while True:
             # key logger
             if not response_made and self.trial_start.getTime() < tp['max response time']:
@@ -193,19 +186,33 @@ class RTs(Controller):
                 break
 
             # Only draw the image during the defined image duration
-            if self.trial_start.getTime() < tp['img duration']:
-                im = tp['target image']
-                im.setPos((0, 0))
-                im.draw()
+            if self.trial_start.getTime() <= tp['img duration']:                
+                if not stimIsOn:
+                    im = tp['target image']
+                    im.setPos((0, 0))
+                    im.draw()
+                    # this is really where the trial start!
+                     # log trial start
+                    self.formattedLog('Start of trial')
+                    self.formattedLog(f'Showing image {image_id}')
+
+                    # onset
+                    self.onset = round(self.run_start.getTime(),3)    
+                    self.win.flip()
+                    stimIsOn = True
 
             # otherwise draw a fixation
             else:
-                fixation.draw()
-            self.win.flip()
+                if not fixIsOn:
+                    fixation.draw()
+                    self.duration = round(self.trial_start.getTime(),3)
+                    self.win.flip()
+                    fixIsOn = True
+            
         self.formattedLog('End of trial')
 
-        self.hit = tp['correct response'] == self.response
-
+        self.hit = tp['category'] == self.response
+        
         # save trial data
         self.updateTrialLog(tp)
 

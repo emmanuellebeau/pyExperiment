@@ -23,6 +23,17 @@ class PupilLogging():
         Todo:
             fix connection for messages to eyelink
         """
+
+def createFolderHierarchy(folders):
+    p = os.path.normpath(folders)
+    p = p.split(os.sep)
+    paths = p[0]
+    for i in range(len(paths)):
+        if not os.path.isdir(paths):
+            os.mkdir(paths)
+        if i < len(p)-1:
+            paths = os.path.join(paths, p[i+1])
+
 def getSubjectInfo(experiment_name='my name', n_sessions=2, n_runs=2):
     # info = gui.GetSubjectInfo(experiment_name)
     # return info.info
@@ -100,12 +111,14 @@ class Controller(EEGLogging, PupilLogging):
         """
         Setups the logger used by the experiment
         """
-        if not os.path.exists('logs'):
-            os.mkdir('logs')
-        logname = f'logs/sub-{self.subject_id}_task-{self.experiment_name}_'\
+        
+        createFolderHierarchy(f'logs/{self.experiment_name}')
+        logname = f'logs/{self.experiment_name}/sub-{self.subject_id}_task-{self.experiment_name}_'\
                   f'ses-{self.session:02d}_run-{self.run:02d}_log.log'
 
         LOG_FORMAT = "%(levelname)s - %(asctime)s - %(message)s"
+        for handler in logging.root.handlers[:]:
+            logging.root.removeHandler(handler)
         logging.basicConfig(filename=logname, level=20, format=LOG_FORMAT)
 
         return logging.getLogger()
