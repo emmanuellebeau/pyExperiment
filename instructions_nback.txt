@@ -1,3 +1,0 @@
-In this task you will be presented with visual images
-On each trial, press the keyboard key Z when the image shown is the same as the one shown on the previous trial.
-Press space to start
