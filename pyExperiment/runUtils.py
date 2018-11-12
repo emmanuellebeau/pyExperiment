@@ -3,7 +3,7 @@ from psychopy import visual, event, core
 import matplotlib.pyplot as plt
 import os
 import numpy as np
-from experiments import *
+from pyExperiment.experiments import *
 from numpy.random import choice as rchoice
 
 """
@@ -29,12 +29,18 @@ def load_images(stim_folder='stim/'):
 def getCorrectResponse(opt, t, keys):
     return keys[list(opt).index(t)]
 
-def loadInfoTxt(file_path='instructions.txt'):
-    b = ''
-    with open(file_path, 'r') as f:
-        for line in f.readlines():
-            b += line + '\n'
+def loadInfoTxt(directory=None,file='instructions.txt'):
+    b = ''        
+    if directory is not None:
+        with open(os.path.join(directory,file), 'r') as f:
+            for line in f.readlines():
+                b += line + '\n'        
+    else:
+        with open(file, 'r') as f:
+            for line in f.readlines():
+                b += line + '\n'
     return b
+
 
 def createImageMasks(images, n_masks, size=10):
     """

@@ -3,8 +3,8 @@ from psychopy.visual import ImageStim
 import os
 import numpy as np
 from numpy.random import choice as rchoice
-from experiments import *
-import runUtils as RU
+from pyExperiment.experiments import *
+import pyExperiment.runUtils as RU
 
 """
 TODO:
@@ -14,6 +14,9 @@ TODO:
 You exit the experiment by pressing q
 
 """
+
+taskdir = os.path.dirname(os.path.realpath(__file__))
+
 
 # define trial settings
 img_dur = 0.5
@@ -26,14 +29,14 @@ trial_length  = 2
 Response options:
 here z corresponds to Yes, and m to No
 """
-keys = ['z', 'm']
+keys = ['z']
 trial_dict = {
             'target image':None, # list of named psychopy objects to draw
             'img duration': img_dur,
             'trial length': trial_length,
             'max response time': max_response_time,
             'correct response': None , # correct key response
-            'possible responses': ['z'] # yes
+            'possible responses': keys # yes
             }
 
 # initiate AB class
@@ -42,10 +45,10 @@ nback = NBackExperiment(distance_to_screen=200, name='n_back')
 """
 Preload images and the masks turn them into textures
 """
-info_txt = RU.loadInfoTxt('instructions_nback.txt')
+info_txt = RU.loadInfoTxt(taskdir,'instructions_nback.txt')
 
 # Load images
-images = RU.load_images()
+images = RU.load_images(os.path.join(taskdir,'stim'))
 n_images = len(images)
 
 img_textures = []

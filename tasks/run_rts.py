@@ -4,8 +4,8 @@ import os
 import numpy as np
 from numpy.random import choice as rchoice
 from numpy.random import random
-from experiments import *
-import runUtils as RU
+from pyExperiment.experiments import *
+import pyExperiment.runUtils as RU
 
 """
 TODO:
@@ -15,6 +15,9 @@ TODO:
 You exit the experiment by pressing q
 
 """
+
+taskdir = os.path.dirname(os.path.realpath(__file__))
+
 
 # define trial settings
 img_dur = 0.1
@@ -43,10 +46,10 @@ exp = RTs(distance_to_screen=200, name='rts')
 """
 Load the instructions and images 
 """
-info_txt = RU.loadInfoTxt('instructions_rts.txt')
+info_txt = RU.loadInfoTxt(taskdir,'instructions_rts.txt')
 
 # Load images
-images = RU.load_images()
+images = RU.load_images(os.path.join(taskdir,'stim'))
 n_images = len(images)
 
 # define a vector with length len(images) that specifies categoryLabels

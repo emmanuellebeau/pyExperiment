@@ -1,5 +1,3 @@
-#from psychopy import gui
-#import GUI as gui
 from psychopy import core
 import sys, logging, os
 
@@ -112,9 +110,8 @@ class Controller(EEGLogging, PupilLogging):
         Setups the logger used by the experiment
         """
         
-        createFolderHierarchy(f'logs/{self.experiment_name}')
-        logname = f'logs/{self.experiment_name}/sub-{self.subject_id}_task-{self.experiment_name}_'\
-                  f'ses-{self.session:02d}_run-{self.run:02d}_log.log'
+        createFolderHierarchy(os.path.join('tasks','logs',f'{self.experiment_name}'))
+        logname = os.path.join('tasks','logs',f'{self.experiment_name}',f'sub-{self.subject_id}_task-{self.experiment_name}_ses-{self.session:02d}_run-{self.run:02d}_log.log')
 
         LOG_FORMAT = "%(levelname)s - %(asctime)s - %(message)s"
         for handler in logging.root.handlers[:]:

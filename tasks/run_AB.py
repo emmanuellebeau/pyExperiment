@@ -3,14 +3,16 @@ from psychopy.visual import ImageStim
 import os
 import numpy as np
 from numpy.random import choice as rchoice
-from experiments import *
-import runUtils as RU
+from pyExperiment.experiments import *
+import pyExperiment.runUtils as RU
 
 """
 TODO:
     fix monitor
     fix dialogue box for getting responses
 """
+
+taskdir = os.path.dirname(os.path.realpath(__file__))
 
 # define trial settings
 fix_time = 0.5
@@ -57,10 +59,10 @@ ab = AB(distance_to_screen=200, name='AB')
 """
 Preload images and the masks turn them into textures
 """
-info_txt = RU.loadInfoTxt('instructions.txt')
+info_txt = RU.loadInfoTxt(taskdir,'instructions.txt')
 
 # Load images
-images = RU.load_images()
+images = RU.load_images(os.path.join(taskdir,'stim'))
 n_images = len(images)
 
 img_textures = []

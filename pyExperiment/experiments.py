@@ -1,89 +1,10 @@
 from psychopy import gui, visual, event, core
 import numpy as np
 import sys, logging, os
-from controller import *
+from pyExperiment.controller import *
+from pyExperiment.utils import shutdown, get_keypress, drawAndWait, initTrialLog, progressBar
 from psychopy import logging
 logging.console.setLevel(logging.CRITICAL)
-
-"""
-A selection of experiment classes
-"""
-
-def shutdown(class_obj):
-    print('Aborted by user!')
-    class_obj.win.close()
-    core.quit()
-
-def get_keypress(class_obj):
-    keys = event.getKeys()
-    if keys:
-        if keys[0] in ['q', 'esc']:
-            shutdown(class_obj)
-        return keys[0]
-    else:
-        return None
-
-def drawAndWait(class_obj, obj_list, responses=[], max_time=False, pos=False):
-    """
-    parameters
-        obj: list of psychopy object with draw method
-        responses: list
-            list of keywords that will exit the loop
-    todo:
-        add possibility of time limit
-    """
-    event.clearEvents()
-    start = core.Clock()
-    while True:
-        if max_time:
-            if start.getTime() > max_time:
-                return 'time out'
-        key = get_keypress(class_obj)
-        if key and key in responses:
-            return key
-        event.clearEvents()
-        for i, obj in enumerate(obj_list):
-            if pos:
-                obj.setPos(pos[i])
-            obj.draw()
-        class_obj.win.flip()
-
-def initTrialLog(log_name, column_headers):
-    """
-    A more specific log for only saving necessary
-    trial by trial information
-    parameters:
-        log_names: str
-            path to log (folder hierarchy will be checked)
-        column_headers: list of strings
-            list of each columns header (need to be in correct order)
-    """
-    result_folder = os.path.dirname(log_name)
-    if result_folder != '':
-        assert os.path.isdir(result_folder), f'{result_folder} does not exist'
-
-    with open(log_name, 'w') as f:
-        f.write('\t'.join(column_headers) + '\n')
-
-def progressBar(win, i, n, load_txt='Loading'):
-    """
-    Progress bar
-    """
-    load_info = visual.TextStim(win, text=load_txt, pos=(0, 1), height=0.6)
-    # make progress bar
-    percentage_done = i/n*100
-    w = percentage_done/10
-    x_pos = -4.5 + w*0.5
-    progress_bar = visual.Rect(win, width=w, height=0.5,
-                               pos=(x_pos, -4), fillColor="white")
-    # print percentage done
-    percent_text = f'{percentage_done:.2f} % done'
-    percentage = visual.TextStim(win, text=percent_text,
-                                 pos=(0, -1), height=0.6)
-    load_info.draw()
-    progress_bar.draw()
-    percentage.draw()
-    win.flip()
 
 class bareBoneExperiment(Controller):
     """
@@ -111,7 +32,7 @@ class RTs(Controller):
         self.secs_per_frame = 1/self.win.getActualFrameRate()
 
         # setup trial log
-        folder = 'results/RTs'
+        folder = os.path.join('tasks','results','RTs')
         createFolderHierarchy(folder)
         log_name = f'sub-{self.subject_id}_task-'\
                    f'{self.experiment_name}_ses-{self.session:02d}_'\
@@ -177,7 +98,7 @@ class RTs(Controller):
             if not response_made and self.trial_start.getTime() < tp['max response time']:
                 key = get_keypress(self)
                 if key and key in tp['possible responses']:
-                    self.rt = self.trial_start.getTime()
+                    self.rt = round(self.trial_start.getTime(),4)
                     self.response = key
                     response_made = True
 
@@ -197,7 +118,7 @@ class RTs(Controller):
                     self.formattedLog(f'Showing image {image_id}')
 
                     # onset
-                    self.onset = round(self.run_start.getTime(),3)    
+                    self.onset = round(self.run_start.getTime(),4)    
                     self.win.flip()
                     stimIsOn = True
 
@@ -205,7 +126,7 @@ class RTs(Controller):
             else:
                 if not fixIsOn:
                     fixation.draw()
-                    self.duration = round(self.trial_start.getTime(),3)
+                    self.duration = round(self.trial_start.getTime(),4)
                     self.win.flip()
                     fixIsOn = True
             
@@ -231,7 +152,7 @@ class AB(Controller):
         self.secs_per_frame = 1/self.win.getActualFrameRate()
         self.T1_accuracy = 0
         # setup trial file
-        folder = 'results/AB'
+        folder = os.path.join('tasks','results','AB')
         createFolderHierarchy(folder)
         log_name = f'sub-{self.subject_id}_task-'\
                    f'{self.experiment_name}_ses-{self.session:02d}_'\
@@ -373,13 +294,13 @@ class NBackExperiment(Controller):
         self.secs_per_frame = 1/self.win.getActualFrameRate()
 
         # setup trial file
-        folder = 'results/nBack'
+        folder = os.path.join('tasks','results','nback')
         createFolderHierarchy(folder)
         log_name = f'sub-{self.subject_id}_task-'\
                    f'{self.experiment_name}_ses-{self.session:02d}_'\
                    f'run-{self.run:02d}_events.tsv'
         self.trial_log_name = os.path.join(folder, log_name)
-        header = ['Subject', 'Nback', 'Session', 'run', 'Trial', 'Image',
+        header = ['Subject', 'Nback', 'Session', 'run', 'Trial', 'Image', 'Onset',
                   'Response', 'RT', 'hit']
         initTrialLog(self.trial_log_name, header)
 
@@ -391,7 +312,7 @@ class NBackExperiment(Controller):
 
         """
         trial_info = [self.subject_id, tp['n back'], self.session,
-                      self.run, self.trial, tp['image ID'], self.response,
+                      self.run, self.trial, tp['image ID'], self.onset, self.response,
                       self.rt, self.hit]
         trial_info = [str(x) for x in trial_info]
         with open(self.trial_log_name, 'a') as f:
@@ -418,23 +339,27 @@ class NBackExperiment(Controller):
         # fixation object
         fixation = visual.GratingStim(win=self.win, size=0.4,
                                       pos=[0,0], sf=0, rgb=-1)
-        # start trial clock
-        self.trial_start = core.Clock()
 
-        # log trial start
-        self.formattedLog('Start of trial')
-        image_id = tp['image ID']
-        self.formattedLog(f'Showing image {image_id}')
-        event.clearEvents()
+        image_id = tp['image ID']                                      
         response_made = False
         self.response = None
         self.rt = -1
+        event.clearEvents()
+
+        # start trial clock
+        self.trial_start = core.Clock()
+        
+        self.onset = round(self.run_start.getTime(),4)
+        # log trial start
+        self.formattedLog('Start of trial')
+        self.formattedLog(f'Showing image {image_id}')
+        
         while True:
             # key logger
             if not response_made and self.trial_start.getTime() < tp['max response time']:
                 key = get_keypress(self)
                 if key and key in tp['possible responses']:
-                    self.rt = self.trial_start.getTime()
+                    self.rt = round(self.trial_start.getTime(),4)
                     self.response = key
                     response_made = True
 
