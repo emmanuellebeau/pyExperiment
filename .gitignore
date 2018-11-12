@@ -1,0 +1,10 @@
+tasks/log
+tasks/results
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+__pycache__
+
