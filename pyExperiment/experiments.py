@@ -144,15 +144,17 @@ class AB(Controller):
         Write this doc string
     """
     def __init__(self, distance_to_screen=60, monitor='testMonitor',
-                 fullscr=True, **args):
+                 fullscr=True, save_video=False, **args):
         super(AB, self).__init__(**args)
         self.win = visual.Window([1024,768], fullscr=fullscr, screen=1,
                                  monitor=monitor, units="deg")
         self.win.mouseVisible = False
         self.secs_per_frame = 1/self.win.getActualFrameRate()
         self.T1_accuracy = 0
+        self.save_video = save_video
+
         # setup trial file
-        folder = os.path.join('tasks','results','AB')
+        folder = 'results/AB'
         createFolderHierarchy(folder)
         log_name = f'sub-{self.subject_id}_task-'\
                    f'{self.experiment_name}_ses-{self.session:02d}_'\
@@ -227,10 +229,20 @@ class AB(Controller):
         n_frames = f_SOA*len(tp['trial sequence'])
         frames = np.arange(n_frames)
         img_frames = np.array([np.arange(f_per_img)+x for x in frames[::f_SOA]]).flatten()
+        # lets jitter image onsets
+        #img_frames = img_frames + np.random.choice([-1, 0, 1], len(img_frames))
         # begin RSVP
         i = 0
         # just to make sure we aren't sending the same log message twice
         _i = -1
+
+        """
+        # if save_video:
+        #     win.getMovieFrame(buffer='back')
+        #     win.saveMovieFrames(fileName=f'frames/frame_{co}.png')
+        Make movie in terminal
+        ffmpeg -framerate 30 -i frames/frame_%d.png -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p video/SFM_illusion.mp4
+        """
         self.formattedLog('Start of RSVP')
         for frame in frames:
             if frame in img_frames:
@@ -242,6 +254,10 @@ class AB(Controller):
                     _i = i
             if frame in frames[f_per_img::f_SOA]:
                 i += 1
+            
+            if self.save_video:
+                self.win.getMovieFrame(buffer='back')
+                self.win.saveMovieFrames(fileName=f'frames/frame_{frame}.png')
             self.win.flip()
         self.formattedLog('End of RSVP')
 
