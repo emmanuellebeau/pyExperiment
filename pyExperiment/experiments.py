@@ -153,6 +153,10 @@ class AB(Controller):
         self.T1_accuracy = 0
         self.save_video = save_video
 
+        if self.save_video:
+            if not os.path.exists('frames'):
+                os.mkdir('frames')
+
         # setup trial file
         folder = 'results/AB'
         createFolderHierarchy(folder)
