@@ -144,16 +144,16 @@ class AB(Controller):
         Write this doc string
     """
     def __init__(self, distance_to_screen=60, monitor='testMonitor',
-                 fullscr=True, save_video=False, **args):
+                 fullscr=True, save_frames=False, **args):
         super(AB, self).__init__(**args)
         self.win = visual.Window([1024,768], fullscr=fullscr, screen=1,
                                  monitor=monitor, units="deg")
         self.win.mouseVisible = False
         self.secs_per_frame = 1/self.win.getActualFrameRate()
         self.T1_accuracy = 0
-        self.save_video = save_video
+        self.save_frames = save_frames
 
-        if self.save_video:
+        if self.save_frames:
             if not os.path.exists('frames'):
                 os.mkdir('frames')
 
@@ -241,7 +241,7 @@ class AB(Controller):
         _i = -1
 
         """
-        # if save_video:
+        # if save_frames:
         #     win.getMovieFrame(buffer='back')
         #     win.saveMovieFrames(fileName=f'frames/frame_{co}.png')
         Make movie in terminal
@@ -259,7 +259,7 @@ class AB(Controller):
             if frame in frames[f_per_img::f_SOA]:
                 i += 1
             
-            if self.save_video:
+            if self.save_frames:
                 self.win.getMovieFrame(buffer='back')
                 self.win.saveMovieFrames(fileName=f'frames/frame_{frame}.png')
             self.win.flip()
