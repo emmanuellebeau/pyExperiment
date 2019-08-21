@@ -11,6 +11,63 @@ TODO:
     fix monitor
     fix dialogue box for getting responses
 """
+def create_run_trials(cond_dict, n_blocks, n_reps):
+    """
+    cond_dict:  dictionary describing name of the cond and how many levels
+                exempel: {'Lag': 3, 'Similarity': 2}
+    n_blocks:   int
+                number of blocks
+    n_reps:     int
+                number of total repetitions of each level
+    Returns a dict of blocks comprising of
+    a list with dicts, each dict correspond to a trial describing
+    which level it should be for each condition
+
+    Example:
+    block_dict =  {'Block 0': [
+                  {'Lag': 2, 'Similarity': 1},
+                  {'Lag': 1, 'Similarity': 0},
+                  {'Lag': 2, 'Similarity': 0},
+                  {'Lag': 2, 'Similarity': 1},
+                  {'Lag': 1, 'Similarity': 0}],
+
+                 'Block 1': [
+                  {'Lag': 0, 'Similarity': 0},
+                  {'Lag': 0, 'Similarity': 1},
+                  {'Lag': 1, 'Similarity': 1},
+                  {'Lag': 0, 'Similarity': 1},
+                  {'Lag': 1, 'Similarity': 1}]}
+    """
+    conds = list(cond_dict.keys())
+    n_conds = len(conds)
+    # total amount of trials
+    tot_trials = np.prod(list(cond_dict.values()))*n_reps
+
+    assert tot_trials % n_blocks == 0, \
+            'Total number of trials most be possible to spread equally across blocks.'\
+            '\nTotal amount of trials: {0}\nNumber of blocks: {1}'.format(
+            tot_trials,n_blocks)
+    trials_per_block = tot_trials // n_blocks
+
+    level_list = [np.arange(x) for x in cond_dict.values()]
+
+    # Create trials
+    trial_list = []
+    for _ in range(n_reps):
+        for trial in itertools.product(*level_list):
+            trial_list.append({conds[x]: trial[x] for x in range(n_conds)})
+
+    # in place shuffle trials
+    np.random.shuffle(trial_list)
+
+    # divide into blocks
+    block_dict = {}
+    for block in range(n_blocks):
+        start_ind = trials_per_block * block
+        end_ind = start_ind + trials_per_block
+        block_dict['Block {0}'.format(block)] = trial_list[start_ind:end_ind]
+
+    return block_dict
 
 def load_images(stim_folder='stim/'):
     """
