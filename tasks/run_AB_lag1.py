@@ -11,6 +11,7 @@ import pyExperiment.runUtils as RU
 TODO:
     fix monitor
     fix dialogue box for getting responses
+    Do we keep the same pairs accros subject or use a different set each time?
 """
 
 taskdir = os.path.dirname(os.path.realpath(__file__))
@@ -93,9 +94,12 @@ for block in range(n_blocks):
                                        pos=(0, 0), height=0.5)
         params = {'class_obj': ab, 'obj_list': [info_message], 'responses': ['space']}
         drawAndWait(**params)
+        
+    #Randomize the lags of T2 for each trial
+    np.random.shuffle(lag)
 
     #array from which the indexes will get picked and then deleted. Assure that
-    #no pairs is shown twice in the same trial. 
+    #no pair is shown twice in the same trial. 
     pool_value = np.arange(len(pairs))
     
     # Create all the trials for the block
