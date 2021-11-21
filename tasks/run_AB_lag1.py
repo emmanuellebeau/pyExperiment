@@ -114,7 +114,7 @@ for block in range(n_blocks):
 
         # Replace the T1 and T2 positions with the targets, make sure that no target is shown
         #twice in a row.
-        if T1 != last_T1 and T1 != last_T2 and T2 != last_T1 and T2 != last_T2 or len(pool_value) == 1:
+        if T1 not in (last_T1, last_T2) and T2 not in (last_T1, last_T2) or len( pool_value) == 1:
             last_T1 = T1
             last_T2 = T2
             t1img = img_textures[T1]
