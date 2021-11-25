@@ -164,9 +164,13 @@ def createRSVP(win, T1, T2, t1_pos, t2_pos,
                                        size=im_size,  flipVert=True)
     return trial_sequence
     
-def define_pairs(n_images, lags):
+def define_pairs(m_reps, n_images, lags):  
+     """
+    First argument of the function is an int defining how many value will
+    be picked each row from a matrix made from all of the possible, non-repeating, pairs
+    that can be made from our images.
+    """
     
-    n_reps = 4 #multiply the number of images by this value to have your total number of pairs
     trial_pairs = []
     
     for j in range(n_images):
