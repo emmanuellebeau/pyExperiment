@@ -15,18 +15,16 @@ TODO:
 
 taskdir = os.path.dirname(os.path.realpath(__file__))
 # define trial settings
-fix_time = 0.02
+fix_time = 0.5
 img_dur = 0.02
-SOA = 0.05
-n_trials = 126 # per block
+SOA = 0.1
+n_trials = 160 # per block
 n_blocks = 3
-#lag = [1, 2, 7]*(int(n_trials/n_blocks))
-t1_pos = 3
-t2_pos = 5
-RSVP_len = 11
+lags = [1, 2, 7]
+RSVP_len = 12
 n_masks = 24
 im_size = 8 # in degrees
-max_response_time = 0.01
+max_response_time = 2.5
 
 """
 Keys should be in order for your response menu
@@ -36,6 +34,7 @@ here z corresponds to the left object, and m to the right in the menu
 keys = ['z', 'm']
 trial_dict = {
             'trial sequence':None, # list of named psychopy objects to draw
+            'list sequence': [],
             'fixation time': fix_time,
             'img duration': img_dur,
             'SOA': SOA,
@@ -67,9 +66,17 @@ images = RU.load_images(os.path.join(taskdir,'stim'))
 n_images = len(images)
 
 # Define Pairs
-pairs = np.loadtxt('AB_pairs_test.txt', dtype = int, delimiter = ',')
-n_pairs = len(pairs)
+pairs = RU.define_pairs(4, n_images, lags)
+np.random.shuffle(pairs)
 split_pairs = np.split(pairs, n_blocks)
+
+"""
+#To test results against the generated list
+file = open('AB_pairs_test.txt', 'w+')
+for i in range(len(pairs)):
+    file.write(str(pairs[i]) + '\n')
+file.close
+"""
 
 img_textures = []
 for i in range(n_images):
@@ -98,8 +105,8 @@ for block in range(n_blocks):
     #array from which the indexes will get picked and then deleted. Assure that
     #no pairs is shown twice in the same trial. 
     pool_value = np.arange(n_trials)
-    last_T1 = 0
-    last_T2 = 0
+    last_T1 = 41
+    last_T2 = 41
     # Create all the trials for the block
     while len(pool_value) != 0:
         # Pick targets and create RSVP sequence
@@ -109,20 +116,27 @@ for block in range(n_blocks):
         pool_value = np.setdiff1d(pool_value, index_pairs)
         
         # Randomly pick RSVP_len number of masks
-        trial_sequence = [mask_textures[np.random.randint(n_masks)]
+        list_sequence = [np.random.randint(n_masks) for j in range(RSVP_len)]
+        trial_sequence = [mask_textures[list_sequence[x]]
                                         for x in range(RSVP_len)]
 
         # Replace the T1 and T2 positions with the targets, make sure that no target is shown
         #twice in a row.
-        if T1 not in (last_T1, last_T2) and T2 not in (last_T1, last_T2) or len( pool_value) == 1:
+        if T1 not in (last_T1, last_T2) and T2 not in (last_T1, last_T2) or len(pool_value) <= 2:
+        #if T2 not in (last_T1, last_T2) or len(pool_value) == 4:
             last_T1 = T1
             last_T2 = T2
+            t1_pos = random.randint(0, (RSVP_len - int(split_pairs[block][index_pairs][2]) - 1))
+            t2_pos = t1_pos + int(split_pairs[block][index_pairs][2])
             t1img = img_textures[T1]
             t1img.name = f'T1 {T1}'
             t2img = img_textures[T2]
             t2img.name = f'T2 {T2}'
+            final_sequence = list_sequence.copy()
             trial_sequence[t1_pos] = t1img
-            trial_sequence[t1_pos + int(pairs[index_pairs][2])] = t2img
+            final_sequence[t1_pos] = T1
+            trial_sequence[t2_pos] = t2img
+            final_sequence[t2_pos] = T2
 
             # Make menu options
             possible_menu_options = np.setdiff1d(range(n_images), [T1, T2])
@@ -147,7 +161,11 @@ for block in range(n_blocks):
 
             # Add specifics to trial_dict
             trial_dict['trial sequence'] = trial_sequence
+            trial_dict['initial sequence'] = list_sequence
+            trial_dict['final sequence'] = final_sequence
             trial_dict['trial type'] = split_pairs[block][index_pairs][2]
+            trial_dict['t1_pos'] = t1_pos
+            trial_dict['t2_pos'] = t2_pos
             trial_dict['T1'] = T1
             trial_dict['T2'] = T2
             trial_dict['T1 options'] = T1_opt
@@ -160,7 +178,7 @@ for block in range(n_blocks):
                                                                         T2, keys)
             ab.addTrial(trial_dict.copy())
         else:
-            pool_value = np.append(pool_value, index_pairs)
+           pool_value = np.append(pool_value, index_pairs)
 
     if block == n_blocks-1: # if last block
         block_txt = f'End of run {ab.run}\npress space to continue'
