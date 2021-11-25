@@ -15,13 +15,13 @@ TODO:
 
 taskdir = os.path.dirname(os.path.realpath(__file__))
 # define trial settings
-fix_time = 0.5
+fix_time = 0.05
 img_dur = 0.02
 SOA = 0.1
-n_trials = 160 # per block
+n_trials = 15 # per block
 n_blocks = 3
 lags = [1, 2, 7]
-RSVP_len = 12
+RSVP_len = 20
 n_masks = 24
 im_size = 8 # in degrees
 max_response_time = 2.5
@@ -31,7 +31,7 @@ Keys should be in order for your response menu
 the first key corresponds to the first alternative in the menu
 here z corresponds to the left object, and m to the right in the menu
 """
-keys = ['z', 'm']
+keys = ['z', 'v', 'm']
 trial_dict = {
             'trial sequence':None, # list of named psychopy objects to draw
             'list sequence': [],
@@ -47,7 +47,7 @@ trial_dict = {
             'T2 menu': None, # list of drawable objects shown as alternatives
             # at what position to draw the menu items
             # first two are images, last position is for the text
-            'Menu pos': ([-6, 0], [6, 0], [0, 6]),
+            'Menu pos': ([-9, 0], [0, 0], [9, 0],  [0, 6]),
             'Response keys': keys, # possible key responses
             'T1 correct response': None, # correct key response for T1
             'T2 correct response': None  # correct key response for T2
@@ -122,8 +122,7 @@ for block in range(n_blocks):
 
         # Replace the T1 and T2 positions with the targets, make sure that no target is shown
         #twice in a row.
-        if T1 not in (last_T1, last_T2) and T2 not in (last_T1, last_T2) or len(pool_value) <= 2:
-        #if T2 not in (last_T1, last_T2) or len(pool_value) == 4:
+        if T1 not in (last_T1, last_T2) and T2 not in (last_T1, last_T2):
             last_T1 = T1
             last_T2 = T2
             t1_pos = random.randint(0, (RSVP_len - int(split_pairs[block][index_pairs][2]) - 1))
@@ -141,10 +140,10 @@ for block in range(n_blocks):
             # Make menu options
             possible_menu_options = np.setdiff1d(range(n_images), [T1, T2])
 
-            T1_opt = np.append(rchoice(possible_menu_options, 1), T1)
+            T1_opt = np.append(rchoice(possible_menu_options, 2, replace = False), T1)
             np.random.shuffle(T1_opt)
 
-            T2_opt = np.append(rchoice(possible_menu_options, 1), T2)
+            T2_opt = np.append(rchoice(possible_menu_options, 2, replace = False), T2)
             np.random.shuffle(T2_opt)
 
             # create text instances for menu
