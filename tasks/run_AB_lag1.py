@@ -18,8 +18,8 @@ taskdir = os.path.dirname(os.path.realpath(__file__))
 fix_time = 0.05
 img_dur = 0.02
 SOA = 0.1
-n_trials = 15 # per block
-n_blocks = 3
+n_trials = 200# per block
+n_blocks = 3          
 lags = [1, 2, 7]
 RSVP_len = 20
 n_masks = 24
@@ -31,7 +31,7 @@ Keys should be in order for your response menu
 the first key corresponds to the first alternative in the menu
 here z corresponds to the left object, and m to the right in the menu
 """
-keys = ['z', 'v', 'm']
+keys = ['z', 'v', 'm', 'space' ]
 trial_dict = {
             'trial sequence':None, # list of named psychopy objects to draw
             'list sequence': [],
@@ -54,7 +54,7 @@ trial_dict = {
             }
 
 # initiate AB class
-ab = AB(distance_to_screen=200, name='AB')
+ab = AB(distance_to_screen=70, name='AB')
 
 """
 Preload images and the masks turn them into textures
@@ -66,7 +66,7 @@ images = RU.load_images(os.path.join(taskdir,'stim'))
 n_images = len(images)
 
 # Define Pairs
-pairs = RU.define_pairs(4, n_images, lags)
+pairs = RU.define_pairs(8, n_images, lags)
 np.random.shuffle(pairs)
 split_pairs = np.split(pairs, n_blocks)
 
@@ -122,10 +122,10 @@ for block in range(n_blocks):
 
         # Replace the T1 and T2 positions with the targets, make sure that no target is shown
         #twice in a row.
-        if T1 not in (last_T1, last_T2) and T2 not in (last_T1, last_T2):
+        if T1 not in (last_T1, last_T2) and T2 not in (last_T1, last_T2) or len(pool_value) <= 2:
             last_T1 = T1
             last_T2 = T2
-            t1_pos = random.randint(0, (RSVP_len - int(split_pairs[block][index_pairs][2]) - 1))
+            t1_pos = random.randint(2, (RSVP_len - int(split_pairs[block][index_pairs][2]) - 1))
             t2_pos = t1_pos + int(split_pairs[block][index_pairs][2])
             t1img = img_textures[T1]
             t1img.name = f'T1 {T1}'
